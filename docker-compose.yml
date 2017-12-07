@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+
+  db:
+    image: postgres:10.1
+    container_name: postgres
+    environment:
+      POSTGRES_PASSWORD: "password"
+      DEBUG: "true"
+    volumes:
+      - .:/postgres
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:4
+    container_name: redis
+
+  web:
+    image: python:3.6
+    container_name: accounting
+    build: .
+    # Although `runserver` auto-detects changes, we do a while loop to properly control startup order issues.
+    # See https://docs.docker.com/compose/startup-order/ for details, and on why `depends_on` is not enough.
+    command: bash -c 'while true; do python3 manage.py runserver 0.0.0.0:1786; sleep 5; done'
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db:5432/postgres
+    volumes:
+      - .:/accounting
+    ports:
+      - "1786:1786"
+    depends_on:
+      - db
+      - redis
