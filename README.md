@@ -33,7 +33,7 @@ $ . accounting/bin/activate
 (accounting) $ pip install -r requirements/dev.txt
 ```
 
-If you come up with any funky issues while setting up, make sure you have the latest `python-dev` and `build-essential` packages installed. You might also want to upgrade to the latest packages you install.
+If you come up with any funky issues while setting up, make sure you have the latest `python3.6-dev` and `build-essential` packages installed. You might also want to upgrade to the latest packages you install.
 
 With `docker-compose` now available, you can simply run:
 

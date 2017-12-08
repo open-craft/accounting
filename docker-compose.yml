@@ -2,7 +2,7 @@ version: '3'
 
 services:
 
-  db:
+  postgres:
     image: postgres:10.1
     container_name: postgres
     environment:
@@ -25,11 +25,11 @@ services:
     # See https://docs.docker.com/compose/startup-order/ for details, and on why `depends_on` is not enough.
     command: bash -c 'while true; do python3 manage.py runserver 0.0.0.0:1786; sleep 5; done'
     environment:
-      DATABASE_URL: postgresql://postgres:password@db:5432/postgres
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/postgres
     volumes:
       - .:/accounting
     ports:
       - "1786:1786"
     depends_on:
-      - db
+      - postgres
       - redis

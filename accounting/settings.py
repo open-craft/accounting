@@ -43,8 +43,7 @@ ENABLE_DEBUG_TOOLBAR = env.bool('ENABLE_DEBUG_TOOLBAR', default=True)
 
 ALLOWED_HOSTS = env.json('ALLOWED_HOSTS', default=[])
 
-
-# Application definition
+# Application #################################################################
 
 LOCAL_APPS = [
     'accounting.invoice',
@@ -102,9 +101,6 @@ DATABASES = {
     'default': env.db(),
 }
 
-# Password validation
-# https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -119,7 +115,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization ########################################################
 
@@ -170,7 +165,6 @@ CACHES = {
     }
 }
 
-
 # Huey (redis task queue) #####################################################
 
 HUEY = {
@@ -186,11 +180,9 @@ HUEY = {
     'consumer': {'workers': 1, 'loglevel': logging.DEBUG},
 }
 
-
 # Emails ######################################################################
 
-EMAIL_BACKEND = env('EMAIL_BACKEND',
-                    default='django.core.mail.backends.console.EmailBackend')
+EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
 
 # From & subject configuration for sent emails
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='accounting@localhost')
