@@ -39,17 +39,17 @@ SECRET_KEY = env('SECRET_KEY')
 
 DEBUG = env.bool('DEBUG', default=True)
 
-ENABLE_DEBUG_TOOLBAR = env.bool('ENABLE_DEBUG_TOOLBAR', default=True)
+ENABLE_DEBUG_TOOLBAR = env.bool('ENABLE_DEBUG_TOOLBAR', default=DEBUG)
 
 ALLOWED_HOSTS = env.json('ALLOWED_HOSTS', default=[])
 
 # Application #################################################################
 
-LOCAL_APPS = [
+LOCAL_APPS = (
     'accounting.invoice',
-]
+)
 
-INSTALLED_APPS = [
+INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -58,11 +58,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'django_extensions',
-    'compressor',
     'rest_framework',
     'huey.contrib.djhuey',
-    'simple_email_confirmation',
-] + LOCAL_APPS
+    'simple_email_confirmation'
+) + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -73,6 +72,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+if DEBUG and ENABLE_DEBUG_TOOLBAR:
+    INSTALLED_APPS += ('debug_toolbar',)
+    MIDDLEWARE += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
+    DEBUG_TOOLBAR_CONFIG = {'SHOW_TOOLBAR_CALLBACK': lambda request: True}
 
 ROOT_URLCONF = 'accounting.urls'
 
@@ -126,28 +130,12 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images) ######################################
 
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    # other finders..
-    'compressor.finders.CompressorFinder',
-)
-
-STATICFILES_DIRS = (
-    root('static'),
-)
-
-STATIC_ROOT = root('build/static')
 STATIC_URL = '/static/'
-
-COMPRESS_PRECOMPILERS = (
-    ('text/x-scss', 'django_libsass.SassCompiler'),
-)
 
 # Django-extensions ###########################################################
 
 SHELL_PLUS = "ipython"
-RUNSERVERPLUS_SERVER_ADDRESS_PORT = env('RUNDEV_SERVER_ADDRESS_PORT', default='0.0.0.0:5000')
+RUNSERVERPLUS_SERVER_ADDRESS_PORT = env('RUNDEV_SERVER_ADDRESS_PORT', default='0.0.0.0:1786')
 
 # Redis cache & locking #######################################################
 

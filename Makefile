@@ -23,7 +23,6 @@ SHELL = /bin/bash
 HONCHO_MANAGE := honcho run python3 manage.py
 HONCHO_MANAGE_TESTS := honcho -e .environ/.env.test run python3 manage.py
 
-
 # Parameters ##################################################################
 
 # For `test_one` use the rest as arguments and turn them into do-nothing targets
@@ -32,7 +31,6 @@ ifeq ($(firstword $(MAKECMDGOALS)),$(filter $(firstword $(MAKECMDGOALS)),test_on
   $(eval $(RUN_ARGS):;@:)
 endif
 
-
 # Commands ####################################################################
 
 clean:
@@ -40,6 +38,9 @@ clean:
 	find -name '*~' -delete
 	find -name '__pycache__' -type d -delete
 	rm -rf .coverage build
+
+install_system_dependencies: apt_get_update
+	sudo -E apt-get install -y `tr -d '\r' < debian_packages.lst`
 
 manage:
 	$(HONCHO_MANAGE) $(RUN_ARGS)
@@ -54,19 +55,35 @@ migration_check: clean
 migration_autogen: clean
 	$(HONCHO_MANAGE) makemigrations
 
+run: clean migration_check
+	honcho start --concurrency "worker=$(WORKERS),worker_low_priority=$(WORKERS_LOW_PRIORITY)"
+
+rundev: clean migration_check
+	honcho start -f Procfile.dev
+
 shell:
 	HUEY_QUEUE_NAME=accounting_low_priority $(HONCHO_MANAGE) shell_plus
 
-requirements_upgrade:
+upgrade_dependencies:
 	pip freeze --local | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip install -U
-
-requirements_dev:
-	pip install -r requirements/dev.txt
 
 # Tests #######################################################################
 
 test_prospector: clean
 	prospector --profile accounting --uses django
 
-test: test_prospector
-	python3 manage.py test
+test_migrations_missing: clean
+	$(HONCHO_MANAGE_TESTS) makemigrations --dry-run --check
+
+test_one: clean
+	$(HONCHO_MANAGE_TESTS) test $(RUN_ARGS)
+
+# TODO: Temporarily 'ok' with 0 coverage. Raise it when we write tests for the first time.
+test_unit: clean
+	honcho -e .environ/.env.test run coverage run --source='.' --omit='*/tests/*' ./manage.py test --noinput
+	coverage html
+	@echo -e "\nCoverage HTML report at file://`pwd`/build/coverage/index.html\n"
+	@coverage report --fail-under 0 || (echo "\nERROR: Coverage is below 94%\n" && exit 2)
+
+test: clean test_prospector test_unit test_migrations_missing
+	@echo -e "\nAll tests OK!\n"

@@ -18,7 +18,7 @@ In fact, to run tests or basically anything with Django management commands, you
 
 ### Environmental Settings
 
-A sample development environment settings file is in `.environ/.env.dev`. You can copy this over to your root as `.env` to use if you'd like to run `make tests` outside of a Docker container, for example.
+A sample development environment settings file is in `.environ/.env.dev`. You can copy this over to your root as `.env` to use if you'd like to run `make tests` outside of a Docker container, for example. It can also be used to override the default environmental variables passed into docker in `docker-compose.yml`.
 
 ### Setting up Docker
 
@@ -30,7 +30,7 @@ First install it using developmental requirements:
 # This assumes your `virtualenv` is on Python 3.x. If not, use the appropriate one.
 $ virtualenv accounting
 $ . accounting/bin/activate
-(accounting) $ pip install -r requirements/dev.txt
+(accounting) $ pip install -r requirements.txt
 ```
 
 If you come up with any funky issues while setting up, make sure you have the latest `python3.6-dev` and `build-essential` packages installed. You might also want to upgrade to the latest packages you install.

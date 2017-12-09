@@ -7,7 +7,6 @@ services:
     container_name: postgres
     environment:
       POSTGRES_PASSWORD: "password"
-      DEBUG: "true"
     volumes:
       - .:/postgres
     ports:
@@ -26,6 +25,8 @@ services:
     command: bash -c 'while true; do python3 manage.py runserver 0.0.0.0:1786; sleep 5; done'
     environment:
       DATABASE_URL: postgresql://postgres:password@postgres:5432/postgres
+      DEBUG: "True"
+      ENABLE_DJANGO_TOOLBAR: "True"
     volumes:
       - .:/accounting
     ports:
