@@ -1,0 +1,34 @@
+# Note: due to security concerns we prefer using git hashes than ansible versions.
+
+- name: geerlingguy.nginx
+  src: https://github.com/geerlingguy/ansible-role-nginx
+  version: e81825546577cfb300efbcaec32aae4716561385
+
+# Our fork of security, can be synced when this is merged: https://github.com/geerlingguy/ansible-role-security/pull/16
+- name: geerlingguy.security
+  src: https://github.com/open-craft/ansible-role-security
+  version: origin/jbzdak/notify-mail
+
+- name: kamaln7.swapfile
+  src: https://github.com/kamaln7/ansible-swapfile
+  version: 8eb0e18d90a7f25b6658fbf56bcba01b84a664fc
+
+- name: common-server
+  src: https://github.com/open-craft/ansible-common-server
+  version: origin/master
+
+- name: configure-apt
+  src: https://github.com/open-craft/ansible-configure-apt
+  version: origin/master
+
+- name: sanity-checker
+  src: https://github.com/open-craft/ansible-sanity-checker/
+  version: origin/master
+
+- name: forward-server-mail
+  src: https://github.com/open-craft/ansible-forward-server-mail
+  version: origin/master
+
+- name: accounting
+  src: https://github.com/open-craft/ansible-accounting
+  version: origin/master
