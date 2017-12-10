@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # OpenCraft -- tools to aid developing and hosting free software projects
 # Copyright (C) 2015-2017 OpenCraft <contact@opencraft.com>
 #
@@ -17,24 +15,29 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-"""
-Accounting URL Configuration.
-"""
+dev.build: ## Build containers.
+	docker-compose build
 
-from django.conf import settings
-from django.conf.urls import include, url
-from django.contrib import admin
+dev.up: ## Bring up all containers.
+	docker-compose up -d
 
-urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^invoice/', include('accounting.invoice.urls')),
-    url(r'^auth/', include('accounting.authentication.urls')),
-]
+dev.%-up: ## Bring up a specific container.
+	docker-compose up $*
 
-if settings.DEBUG and settings.ENABLE_DEBUG_TOOLBAR:
-    import debug_toolbar
-    # "debug" URL pattern must be before "site" URL pattern.
-    # See https://github.com/jazzband/django-debug-toolbar/issues/529
-    urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ]
+dev.down: ## Bring down all containers.
+	docker-compose -f docker-compose.yml down
+
+dev.stop: ## Stop all containers.
+	docker-compose stop
+
+dev.%-stop: ## Stop a service. Requires *service* name, not container name; i.e. use `web` for the accounting container.
+	docker-compose stop $*
+
+dev.logs: ## See and follow logs of all services.
+	docker-compose logs -f
+
+dev.%-logs: ## See logs of a service. Requires *service* name, not container name. i.e. use `web` for the accounting container.
+	docker-compose logs -f --tail=500 $*
+
+dev.%-shell: ## Shell into the docker container.
+	docker exec -i -t $* /bin/bash

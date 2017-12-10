@@ -47,6 +47,7 @@ ALLOWED_HOSTS = env.json('ALLOWED_HOSTS', default=[])
 
 LOCAL_APPS = (
     'accounting.invoice',
+    'accounting.authentication',
 )
 
 INSTALLED_APPS = (
@@ -54,13 +55,11 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',
     'django.contrib.staticfiles',
 
     'django_extensions',
-    'rest_framework',
     'huey.contrib.djhuey',
-    'simple_email_confirmation'
+    'rest_framework',
 ) + LOCAL_APPS
 
 MIDDLEWARE = [
@@ -98,6 +97,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'accounting.wsgi.application'
 
+SITE_ID = env('SITE_ID', default=1)
+
 # Database ####################################################################
 
 # Set via the environment variable `DATABASE_URL`
@@ -119,6 +120,26 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# REST Framework (APIs, Auth) #################################################
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '100/hour',
+        'anon': '50/hour',
+    },
+}
+
+JWT_AUDIENCE = 'accounting'
+JWT_ISSUER = 'accounting'
 
 # Internationalization ########################################################
 

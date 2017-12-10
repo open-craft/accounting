@@ -1,6 +1,9 @@
 FROM python:3.6
-ENV PYTHONUNBUFFERED=1 \
-    POSTGRES_PASSWORD='password'
+
+RUN rm -rf /accounting /venvs
 COPY . /accounting
 WORKDIR /accounting
-RUN pip install -r requirements/dev.txt
+
+RUN virtualenv /venvs/accounting
+RUN . /venvs/accounting/bin/activate
+RUN pip install -r requirements.txt

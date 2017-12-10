@@ -18,23 +18,14 @@
 #
 
 """
-Accounting URL Configuration.
+Auth application configuration.
 """
 
-from django.conf import settings
-from django.conf.urls import include, url
-from django.contrib import admin
+from django.apps import AppConfig
 
-urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^invoice/', include('accounting.invoice.urls')),
-    url(r'^auth/', include('accounting.authentication.urls')),
-]
 
-if settings.DEBUG and settings.ENABLE_DEBUG_TOOLBAR:
-    import debug_toolbar
-    # "debug" URL pattern must be before "site" URL pattern.
-    # See https://github.com/jazzband/django-debug-toolbar/issues/529
-    urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ]
+class AuthenticationConfig(AppConfig):
+    """
+    Application configuration for the Authentication app.
+    """
+    name = 'authentication'

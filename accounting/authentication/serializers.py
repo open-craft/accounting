@@ -18,23 +18,22 @@
 #
 
 """
-Accounting URL Configuration.
+Auth serializers.
 """
 
-from django.conf import settings
-from django.conf.urls import include, url
-from django.contrib import admin
+from django.contrib.auth import get_user_model
 
-urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^invoice/', include('accounting.invoice.urls')),
-    url(r'^auth/', include('accounting.authentication.urls')),
-]
+from rest_framework import serializers
 
-if settings.DEBUG and settings.ENABLE_DEBUG_TOOLBAR:
-    import debug_toolbar
-    # "debug" URL pattern must be before "site" URL pattern.
-    # See https://github.com/jazzband/django-debug-toolbar/issues/529
-    urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ]
+USER_MODEL = get_user_model()
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """
+    User model serializer.
+    """
+
+    class Meta:
+        model = USER_MODEL
+        fields = ('username', 'email', 'first_name', 'last_name')
+        read_only_fields = ('email', )
