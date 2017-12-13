@@ -21,9 +21,9 @@
 Django settings for the Accounting Automation project.
 """
 
-import os
-import logging
 from urllib.parse import urlparse
+import logging
+import os
 
 import environ
 
@@ -39,30 +39,37 @@ SECRET_KEY = env('SECRET_KEY')
 
 DEBUG = env.bool('DEBUG', default=True)
 
-ENABLE_DEBUG_TOOLBAR = env.bool('ENABLE_DEBUG_TOOLBAR', default=True)
+ENABLE_DEBUG_TOOLBAR = env.bool('ENABLE_DEBUG_TOOLBAR', default=DEBUG)
 
 ALLOWED_HOSTS = env.json('ALLOWED_HOSTS', default=[])
 
 # Application #################################################################
 
-LOCAL_APPS = [
+LOCAL_APPS = (
+    'accounting.account',
+    'accounting.authentication',
+    'accounting.bank',
     'accounting.invoice',
-]
+    'accounting.registration',
+)
 
-INSTALLED_APPS = [
+INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django_countries',
     'django_extensions',
-    'compressor',
-    'rest_framework',
+    'djmoney',
     'huey.contrib.djhuey',
+    'localflavor',
+    'rest_framework',
+    'rest_framework.authtoken',
     'simple_email_confirmation',
-] + LOCAL_APPS
+    'vies',
+) + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -73,6 +80,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+if DEBUG and ENABLE_DEBUG_TOOLBAR:
+    INSTALLED_APPS += ('debug_toolbar',)
+    MIDDLEWARE += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
+    DEBUG_TOOLBAR_CONFIG = {'SHOW_TOOLBAR_CALLBACK': lambda request: True}
 
 ROOT_URLCONF = 'accounting.urls'
 
@@ -93,6 +105,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'accounting.wsgi.application'
+
+SITE_ID = env('SITE_ID', default=1)
 
 # Database ####################################################################
 
@@ -116,6 +130,20 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# REST Framework (APIs, Auth) #################################################
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '100/hour',
+        'anon': '50/hour',
+    },
+}
+
 # Internationalization ########################################################
 
 LANGUAGE_CODE = 'en-us'
@@ -126,28 +154,12 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images) ######################################
 
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    # other finders..
-    'compressor.finders.CompressorFinder',
-)
-
-STATICFILES_DIRS = (
-    root('static'),
-)
-
-STATIC_ROOT = root('build/static')
 STATIC_URL = '/static/'
-
-COMPRESS_PRECOMPILERS = (
-    ('text/x-scss', 'django_libsass.SassCompiler'),
-)
 
 # Django-extensions ###########################################################
 
 SHELL_PLUS = "ipython"
-RUNSERVERPLUS_SERVER_ADDRESS_PORT = env('RUNDEV_SERVER_ADDRESS_PORT', default='0.0.0.0:5000')
+RUNSERVERPLUS_SERVER_ADDRESS_PORT = env('RUNDEV_SERVER_ADDRESS_PORT', default='0.0.0.0:1786')
 
 # Redis cache & locking #######################################################
 
@@ -200,3 +212,7 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 SIMPLE_EMAIL_CONFIRMATION_AUTO_ADD = False
 
 ADMINS = env.json('ADMINS', default=set())
+
+# MONEY #######################################################################
+
+DEFAULT_CURRENCY = 'EUR'
