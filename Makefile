@@ -17,12 +17,16 @@
 
 # Config ######################################################################
 
+# Any configuration variable can be overridden with `VARIABLE = VALUE` in a git-ignored `private.mk` file.
+
+.DEFAULT_GOAL := help
+HELP_SPACING ?= 30
+COVERAGE_THRESHOLD ?= 60
 WORKERS ?= 3
 WORKERS_LOW_PRIORITY ?= 3
-SHELL = /bin/bash
+SHELL ?= /bin/bash
 HONCHO_MANAGE := honcho run python3 manage.py
 HONCHO_MANAGE_TESTS := honcho -e .environ/.env.test run python3 manage.py
-
 
 # Parameters ##################################################################
 
@@ -32,41 +36,74 @@ ifeq ($(firstword $(MAKECMDGOALS)),$(filter $(firstword $(MAKECMDGOALS)),test_on
   $(eval $(RUN_ARGS):;@:)
 endif
 
-
 # Commands ####################################################################
 
-clean:
+help: ## Display this help message.
+	@echo "Please use \`make <target>' where <target> is one of"
+	@perl -nle'print $& if m{^[\.a-zA-Z_-]+:.*?## .*$$}' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m  %-$(HELP_SPACING)s\033[0m %s\n", $$1, $$2}'
+
+clean: ## Remove all temporary files.
 	find -name '*.pyc' -delete
 	find -name '*~' -delete
 	find -name '__pycache__' -type d -delete
 	rm -rf .coverage build
 
-manage:
+install_system_dependencies: apt_get_update ## Install system-level dependencies from `debian_packages.lst`.
+	sudo -E apt-get install -y `tr -d '\r' < debian_packages.lst`
+
+manage: ## Run a management command.
 	$(HONCHO_MANAGE) $(RUN_ARGS)
 
-migrate: clean
+migrate: clean ## Run migrations.
 	$(HONCHO_MANAGE) migrate
 
-# Check for unapplied migrations
-migration_check: clean
-	!(($(HONCHO_MANAGE) showmigrations | grep '\[ \]') && printf "\n\033[0;31mERROR: Pending migrations found\033[0m\n\n")
+migration_check: clean ## Check for unapplied migrations.
+	@!(($(HONCHO_MANAGE) showmigrations | grep '\[ \]') && printf "\n\033[0;31mERROR: Pending migrations found\033[0m\n\n")
 
-migration_autogen: clean
+migration_autogen: clean ## Generate migrations.
 	$(HONCHO_MANAGE) makemigrations
 
-shell:
+run: clean migration_check ## Run the accounting service in a production setting with concurrency.
+	honcho start --port 1786 --concurrency "worker=$(WORKERS),worker_low_priority=$(WORKERS_LOW_PRIORITY)"
+
+rundev: clean migration_check ## Run the developmental server using `runserver_plus`. Different than docker.
+	honcho start --port 1786 -f Procfile.dev
+
+shell: ## Start the power shell.
 	HUEY_QUEUE_NAME=accounting_low_priority $(HONCHO_MANAGE) shell_plus
 
-requirements_upgrade:
+upgrade_dependencies: ## Upgrade to the latest dependencies.
 	pip freeze --local | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip install -U
 
-requirements_dev:
-	pip install -r requirements/dev.txt
+isort: ## Sort all imports in the project by a standard. See .isort.cfg for configuration.
+	isort --recursive accounting
 
 # Tests #######################################################################
 
-test_prospector: clean
+test_quality: clean ## Run quality tests.
+	isort --check-only --recursive accounting
 	prospector --profile accounting --uses django
 
-test: test_prospector
-	python3 manage.py test
+test_migrations_missing: clean ## Check if migrations are missing.
+	@$(HONCHO_MANAGE_TESTS) makemigrations --dry-run --check
+
+test_one: clean ## Run tests for a specific path.
+	$(HONCHO_MANAGE_TESTS) test $(RUN_ARGS)
+
+# TODO: Temporarily 'ok' with 0 coverage. Raise it when we write tests for the first time.
+test_unit: clean ## Run all unit tests.
+	@honcho -e .environ/.env.test run coverage run --source='.' --omit='*/tests/*' ./manage.py test --noinput
+	coverage html
+	@echo "\nCoverage HTML report at file://`pwd`/build/coverage/index.html\n"
+	@coverage report --fail-under $(COVERAGE_THRESHOLD) || (echo "\nERROR: Coverage is below $(COVERAGE_THRESHOLD)%\n" && exit 2)
+
+test: clean test_quality test_unit test_migrations_missing ## Run all tests.
+	@echo "\nAll tests OK!\n"
+
+# We ignore `private.mk` so you can define your own make targets, or override some.
+include *.mk
+
+# Include `private.mk` last to make sure to override anything.
+ifneq ("$(wildchar private.mk)","")
+	include private.mk
+endif

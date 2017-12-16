@@ -7,11 +7,10 @@ services:
     container_name: postgres
     environment:
       POSTGRES_PASSWORD: "password"
-      DEBUG: "true"
-    volumes:
-      - .:/postgres
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   redis:
     image: redis:4
@@ -25,7 +24,10 @@ services:
     # See https://docs.docker.com/compose/startup-order/ for details, and on why `depends_on` is not enough.
     command: bash -c 'while true; do python3 manage.py runserver 0.0.0.0:1786; sleep 5; done'
     environment:
+      PYTHONUNBUFFERED: 1
       DATABASE_URL: postgresql://postgres:password@postgres:5432/postgres
+      DEBUG: "True"
+      ENABLE_DJANGO_TOOLBAR: "True"
     volumes:
       - .:/accounting
     ports:
@@ -33,3 +35,6 @@ services:
     depends_on:
       - postgres
       - redis
+
+volumes:
+  postgres_data:

@@ -30,7 +30,7 @@ First install it using developmental requirements:
 # This assumes your `virtualenv` is on Python 3.x. If not, use the appropriate one.
 $ virtualenv accounting
 $ . accounting/bin/activate
-(accounting) $ pip install -r requirements/dev.txt
+(accounting) $ pip install -r requirements.txt
 ```
 
 If you come up with any funky issues while setting up, make sure you have the latest `python3.6-dev` and `build-essential` packages installed. You might also want to upgrade to the latest packages you install.

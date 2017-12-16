@@ -18,26 +18,12 @@
 #
 
 """
-Accounting URL Configuration.
+Admin for the Bank application.
 """
 
-from django.conf import settings
-from django.conf.urls import include, url
 from django.contrib import admin
 
-urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^account/', include('accounting.account.urls', namespace='account')),
-    url(r'^auth/', include('accounting.authentication.urls', namespace='auth')),
-    url(r'^bank/', include('accounting.bank.urls', namespace='bank')),
-    url(r'^invoice/', include('accounting.invoice.urls', namespace='invoice')),
-    url(r'^registration/', include('accounting.registration.urls', namespace='registration')),
-]
+from accounting.bank.models import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
-if settings.DEBUG and settings.ENABLE_DEBUG_TOOLBAR:
-    import debug_toolbar
-    # "debug" URL pattern must be before "site" URL pattern.
-    # See https://github.com/jazzband/django-debug-toolbar/issues/529
-    urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ]
+for model in (Bank, BankAccount):  # NOQA
+    admin.site.register(model)
