@@ -21,27 +21,21 @@
 Bank application models.
 """
 
-from uuid import uuid4
-
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from djmoney.models.fields import CurrencyField
-from localflavor.au.models import AUBusinessNumberField
-from localflavor.generic.models import BICField, IBANField
-from vies.models import VATINField
 
 from accounting.account.models import Account, Address
-from accounting.bank.fields import AUBankStateBranchField
+from accounting.bank.choices import BankAccountIdentifiers, BankAccountType
+from accounting.common.models import UuidModel
 
 
-class Bank(models.Model):
+class Bank(UuidModel):
     """
     A bank to represent more details about bank accounts for users.
     """
 
-    uuid = models.UUIDField(
-        blank=False, null=False, default=uuid4, editable=False, verbose_name=_("UUID"),
-        help_text=_("The universally unique identifier for this bank."))
     name = models.CharField(
         max_length=80,
         help_text=_("The official name of the bank."))
@@ -60,7 +54,7 @@ class Bank(models.Model):
         return '{name} - {identifier}'.format(name=self.name, identifier=self.uuid)
 
 
-class BankAccount(models.Model):
+class BankAccount(UuidModel):
     """
     A bank account stores details to help identify a particular user's bank account anywhere in the world.
 
@@ -75,16 +69,8 @@ class BankAccount(models.Model):
     The bank account's currency and address, however, always exists, so that is required.
     """
 
-    CHECKING = 'checking'
-    SAVINGS = 'savings'
-    BANK_ACCOUNT_TYPES = (
-        (CHECKING, _("Checking Account")),
-        (SAVINGS, _("Savings Account")),
-    )
+    IDENTIFICATION_SCHEMA = {identifier[0]: '' for identifier in BankAccountIdentifiers.choices}
 
-    uuid = models.UUIDField(
-        blank=False, null=False, default=uuid4, editable=False, verbose_name=_("UUID"),
-        help_text=_("The universally unique identifier for this bank account."))
     bank = models.ForeignKey(
         Bank, models.CASCADE, related_name='bank_accounts',
         help_text=_("The bank to which this bank account belongs."))
@@ -95,33 +81,11 @@ class BankAccount(models.Model):
     currency = CurrencyField(
         help_text=_("The currency expected to be held in this bank account."))
     type = models.CharField(
-        max_length=30, choices=BANK_ACCOUNT_TYPES,
+        max_length=30, choices=BankAccountType.choices,
         help_text=_("Whether this is a checking or savings account."))
-    iban = IBANField(
-        blank=True, null=True,
-        help_text=_("The unique International Bank Account Number of the provider's bank account."))
-    bic = BICField(
-        blank=True, null=True,
-        help_text=_("The 11-character SWIFT / BIC (Business Identifier Code) code used to identify a "
-                    "bank or financial institution globally."))
-    abn = AUBusinessNumberField(
-        blank=True, null=True,
-        help_text=_("The 11-character Australian Business Number used to identify business entities in Australia."))
-    bsb = AUBankStateBranchField(
-        blank=True, null=True,
-        help_text=_("The 6-character Bank State Branch code used as a bank identifier in Australia."))
-    vat = VATINField(
-        blank=True, null=True,
-        help_text=_("The Value Added Tax identification number used in and required by some countries. "
-                    "This can also be used to store a General Sales Tax (GST) identification number."))
-    account_number = models.CharField(
-        max_length=30, blank=True, null=True,
-        help_text=_("The bank account number used to help identify the account. "
-                    "Required for only some countries."))
-    routing_number = models.CharField(
-        max_length=30, blank=True, null=True,
-        help_text=_("The bank account routing number used to help identify the account. "
-                    "Required for only some countries."))
+    identification = JSONField(
+        blank=True, default=IDENTIFICATION_SCHEMA,
+        help_text=_("The unique combination of identification information for this bank account."))
 
     class Meta:
         verbose_name = _('Bank Account')
@@ -132,7 +96,7 @@ class BankAccount(models.Model):
         Indicate who this bank account belongs to and in which bank it is.
         """
         return '{username}: {bank_name} ({currency}, {type})'.format(
-            username=str(self.user_account),
+            username=self.user_account,
             bank_name=self.bank.name,
             currency=self.currency,
             type=self.type,

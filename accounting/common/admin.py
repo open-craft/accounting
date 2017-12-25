@@ -18,31 +18,12 @@
 #
 
 """
-Authentication models.
+Admin configurations used across the Accounting service.
 """
 
-from django.contrib.auth import models
-from django.db.models import CharField
-from django.utils.translation import ugettext_lazy as _
-
-from accounting.common.models import UuidModel
+from django.contrib import admin
 
 
-class User(UuidModel, models.AbstractUser):
-    """
-    A `User` model with custom columns, like `uuid` and `full_name`.
-    """
-
-    full_name = CharField(
-        max_length=255, blank=True, null=True,
-        help_text=_("The full name of this user."))
-
-    def get_full_name(self):
-        """
-        Gets the full name of this user, whether that's through `full_name` or `first_name` and `last_name`.
-        """
-        return self.full_name or super().get_full_name()
-
-    class Meta:
-        verbose_name = _("User")
-        verbose_name_plural = _("Users")
+class UuidModelAdmin(admin.ModelAdmin):
+    """ Admin configuration for the `UuidModel` model. """
+    list_display = ('uuid',)

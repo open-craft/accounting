@@ -18,36 +18,23 @@
 #
 
 """
-Bank serializers.
+Common models used throughout the Accounting service.
 """
 
-from rest_framework.serializers import JSONField
+from uuid import uuid4
 
-from accounting.address.serializers import AddressSerializer
-from accounting.bank import models
-from accounting.common.serializers import UuidModelSerializer
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 
-class BankSerializer(UuidModelSerializer):
+class UuidModel(models.Model):
     """
-    Bank model serializer.
-    """
-
-    address = AddressSerializer(required=False)
-
-    class Meta(UuidModelSerializer.Meta):
-        model = models.Bank
-        fields = UuidModelSerializer.Meta.fields + ('name', 'address',)
-
-
-class BankAccountSerializer(UuidModelSerializer):
-    """
-    Bank Account serializer.
+    A reusable model to allow storing UUIDs as a column.
     """
 
-    bank = BankSerializer()
-    identification = JSONField()
+    uuid = models.UUIDField(
+        blank=False, null=False, default=uuid4, editable=False, verbose_name=_("UUID"),
+        help_text=_("The universally unique identifier for this model instance."))
 
-    class Meta(UuidModelSerializer.Meta):
-        model = models.BankAccount
-        fields = UuidModelSerializer.Meta.fields + ('bank', 'currency', 'type', 'identification',)
+    class Meta:
+        abstract = True

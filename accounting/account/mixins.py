@@ -34,13 +34,3 @@ class AccountViewMixin:
     lookup_field = 'user__username'
     queryset = models.Account.objects.all()
     permission_classes = (IsAuthenticated,)
-
-
-class AddressViewMixin:
-    """
-    Mixin class adding common fields/functions for other address views to use.
-    """
-
-    lookup_field = 'accounts__user__username'
-    queryset = models.Address.objects.all()
-    permission_classes = (IsAuthenticated,)

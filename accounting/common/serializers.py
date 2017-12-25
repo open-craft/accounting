@@ -18,36 +18,28 @@
 #
 
 """
-Bank serializers.
+Serializers used by multiple applications in the Accounting service.
 """
 
-from rest_framework.serializers import JSONField
-
-from accounting.address.serializers import AddressSerializer
-from accounting.bank import models
-from accounting.common.serializers import UuidModelSerializer
+from rest_framework import serializers
+from rest_framework.relations import SlugRelatedField
 
 
-class BankSerializer(UuidModelSerializer):
+class UuidRelatedField(SlugRelatedField):
     """
-    Bank model serializer.
+    A `SlugRelatedField` whose `slug_field` is the `uuid` field by default.
     """
 
-    address = AddressSerializer(required=False)
-
-    class Meta(UuidModelSerializer.Meta):
-        model = models.Bank
-        fields = UuidModelSerializer.Meta.fields + ('name', 'address',)
+    def __init__(self, slug_field='uuid', **kwargs):
+        super().__init__(slug_field=slug_field, **kwargs)
 
 
-class BankAccountSerializer(UuidModelSerializer):
+class UuidModelSerializer(serializers.ModelSerializer):
     """
-    Bank Account serializer.
+    `ModelSerializer` which has a UUID field by default.
     """
 
-    bank = BankSerializer()
-    identification = JSONField()
+    uuid = serializers.ReadOnlyField()
 
-    class Meta(UuidModelSerializer.Meta):
-        model = models.BankAccount
-        fields = UuidModelSerializer.Meta.fields + ('bank', 'currency', 'type', 'identification',)
+    class Meta:
+        fields = ('uuid',)

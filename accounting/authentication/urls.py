@@ -23,8 +23,8 @@ Auth URL Configuration.
 
 from django.conf.urls import url
 
-from accounting.account.urls import USERNAME_REGEX
 from accounting.authentication.views import ObtainAuthToken, RevokeAuthToken, UserView, VerifyAuthToken
+from accounting.common.urls import USERNAME_REGEX
 
 token_urlpatterns = [
     url(r'^token/obtain/', ObtainAuthToken.as_view()),

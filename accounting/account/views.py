@@ -21,8 +21,7 @@
 Views for the Account application.
 
 TODO: For increased security, do the following:
-TODO: 1. Make each object's unique identifier a UUID, rather than an ID, for serialization purposes.
-TODO: 2. For views that require the user to be authenticated and change some user information,
+TODO: 1. For views that require the user to be authenticated and change some user information,
 TODO:    make sure the information being changed belongs to that user. This part should be done before deployment!
 TODO:    It will require a new permission class to check if the token matches the user's.
 """

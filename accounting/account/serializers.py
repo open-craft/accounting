@@ -22,94 +22,66 @@ Account serializers.
 """
 
 from django.contrib.auth import get_user_model
-from rest_framework import serializers
 
 from accounting.account import models
+from accounting.address.serializers import AddressSerializer
+from accounting.authentication.serializers import UserSerializer
 from accounting.bank.serializers import BankAccountSerializer
+from accounting.common.serializers import UuidModelSerializer, UuidRelatedField
 
 USER_MODEL = get_user_model()
 
 
-class HourlyRateAccountSerializer(serializers.ModelSerializer):
-    """
-    Account serializer to be used by the hourly rate serializer.
-    """
-
-    address = AddressSerializer(required=False)
-
-    class Meta:
-        model = models.Account
-        fields = ('user', 'address', 'business_name', 'occupation',)
-
-
-class HourlyRateSerializer(serializers.ModelSerializer):
-    """
-    Hourly rate serializer.
-    """
-
-    hourly_rate = serializers.SerializerMethodField()
-    currency = serializers.SerializerMethodField()
-    provider = HourlyRateAccountSerializer(required=False)
-    client = HourlyRateAccountSerializer(required=False)
-
-    class Meta:
-        model = models.HourlyRate
-        fields = ('hourly_rate', 'currency', 'provider', 'client',)
-
-    def get_hourly_rate(self, obj):  # pylint: disable=no-self-use
-        """
-        Get the amount of the hourly rate.
-        """
-        return str(obj.hourly_rate.amount)
-
-    def get_currency(self, obj):  # pylint: disable=no-self-use
-        """
-        Get the currency of the hourly rate.
-        """
-        return str(obj.hourly_rate.currency)
-
-
-class CreateHourlyRateSerializer(serializers.ModelSerializer):
-    """
-    Hourly rate serializer meant specifically for creating new hourly rate links between two accounts.
-    """
-
-    id = serializers.ReadOnlyField()  # pylint: disable=invalid-name
-    provider = serializers.PrimaryKeyRelatedField(queryset=models.Account.objects.all())
-    client = serializers.PrimaryKeyRelatedField(required=False, queryset=models.Account.objects.all())
-
-    class Meta:
-        model = models.HourlyRate
-        fields = ('id', 'hourly_rate', 'hourly_rate_currency', 'provider', 'client',)
-
-
-class AccountSerializer(serializers.ModelSerializer):
+class AccountSerializer(UuidModelSerializer):
     """
     Account model serializer.
     """
 
+    user = UserSerializer(required=False)
     address = AddressSerializer(required=False)
     bank_accounts = BankAccountSerializer(required=False, many=True)
 
-    class Meta:
+    class Meta(UuidModelSerializer.Meta):
         model = models.Account
-        fields = ('address', 'business_name', 'occupation', 'bank_accounts',)
+        fields = (UuidModelSerializer.Meta.fields +
+                  ('user', 'address', 'business_name', 'occupation', 'bank_accounts', 'vat',))
 
 
-class CreateAccountSerializer(serializers.ModelSerializer):
+class CreateAccountSerializer(UuidModelSerializer):
     """
     Account model serializer used specifically for creating new accounts, i.e. through the registration process.
 
     When referencing what user or address instance this account should be linked to, we use the ID of the object.
 
-    The hourly rate of an account is not set here -- use the returned ID of accounts to make links between them through
-    the hourly rate model.
+    The hourly rate of an account is not set here -- use the returned UUID of accounts to make links between them
+    through the hourly rate model.
     """
 
-    id = serializers.ReadOnlyField()  # pylint: disable=invalid-name
-    user = serializers.PrimaryKeyRelatedField(queryset=USER_MODEL.objects.filter(is_active=True))
-    address = serializers.PrimaryKeyRelatedField(queryset=models.Address.objects.all())
+    user = UuidRelatedField(queryset=USER_MODEL.objects.filter(is_active=True))
+    address = UuidRelatedField(queryset=models.Address.objects.all())
 
-    class Meta:
+    class Meta(UuidModelSerializer.Meta):
         model = models.Account
-        fields = ('id', 'user', 'address', 'business_name', 'occupation',)
+        fields = UuidModelSerializer.Meta.fields + ('user', 'address', 'business_name', 'occupation', 'vat',)
+
+
+class HourlyRateSerializer(UuidModelSerializer):
+    """
+    Hourly rate serializer.
+    """
+
+    provider = AccountSerializer(required=False)
+    client = AccountSerializer(required=False)
+
+    class Meta(UuidModelSerializer.Meta):
+        model = models.HourlyRate
+        fields = UuidModelSerializer.Meta.fields + ('hourly_rate', 'hourly_rate_currency', 'provider', 'client',)
+
+
+class CreateHourlyRateSerializer(HourlyRateSerializer):
+    """
+    Hourly rate serializer meant specifically for creating new hourly rate links between two accounts.
+    """
+
+    provider = UuidRelatedField(queryset=models.Account.objects.all())
+    client = UuidRelatedField(required=False, queryset=models.Account.objects.all())

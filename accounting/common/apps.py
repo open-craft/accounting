@@ -18,36 +18,14 @@
 #
 
 """
-Bank serializers.
+Application configuration for the `common` app.
 """
 
-from rest_framework.serializers import JSONField
-
-from accounting.address.serializers import AddressSerializer
-from accounting.bank import models
-from accounting.common.serializers import UuidModelSerializer
+from django.apps import AppConfig
 
 
-class BankSerializer(UuidModelSerializer):
+class CommonConfig(AppConfig):
     """
-    Bank model serializer.
+    Application configuration for the `common` app.
     """
-
-    address = AddressSerializer(required=False)
-
-    class Meta(UuidModelSerializer.Meta):
-        model = models.Bank
-        fields = UuidModelSerializer.Meta.fields + ('name', 'address',)
-
-
-class BankAccountSerializer(UuidModelSerializer):
-    """
-    Bank Account serializer.
-    """
-
-    bank = BankSerializer()
-    identification = JSONField()
-
-    class Meta(UuidModelSerializer.Meta):
-        model = models.BankAccount
-        fields = UuidModelSerializer.Meta.fields + ('bank', 'currency', 'type', 'identification',)
+    name = 'common'

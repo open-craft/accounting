@@ -24,8 +24,8 @@ Account URL Configuration.
 from django.conf.urls import url
 
 from accounting.account import views
+from accounting.common.urls import USERNAME_REGEX
 
-USERNAME_REGEX = r'[\w.@_+-]+'
 ACCOUNT_PATH_REGEX = r'(?P<user__username>{username})'.format(username=USERNAME_REGEX)
 HOURLY_RATE_PATH_REGEX = (r'rate/'
                           r'(?P<provider__user__username>{username})/'

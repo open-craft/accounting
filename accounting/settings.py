@@ -50,6 +50,7 @@ LOCAL_APPS = (
     'accounting.address',
     'accounting.authentication',
     'accounting.bank',
+    'accounting.common',
     'accounting.invoice',
     'accounting.registration',
 )
@@ -172,6 +173,10 @@ STATICFILES_DIRS = (
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = root('media')
+
+# Authentication ##############################################################
+
+AUTH_USER_MODEL = 'authentication.User'
 
 # Django-extensions ###########################################################
 
