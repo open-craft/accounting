@@ -22,7 +22,7 @@ Accounting URL Configuration.
 """
 
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import include, static, url
 from django.contrib import admin
 
 urlpatterns = [
@@ -34,10 +34,18 @@ urlpatterns = [
     url(r'^registration/', include('accounting.registration.urls', namespace='registration')),
 ]
 
-if settings.DEBUG and settings.ENABLE_DEBUG_TOOLBAR:
-    import debug_toolbar
-    # "debug" URL pattern must be before "site" URL pattern.
-    # See https://github.com/jazzband/django-debug-toolbar/issues/529
+if 'rosetta' in settings.INSTALLED_APPS:
     urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
+        url(r'^rosetta/', include('rosetta.urls'))
     ]
+
+if settings.DEBUG:
+    urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    if settings.ENABLE_DEBUG_TOOLBAR:
+        import debug_toolbar
+        # "debug" URL pattern must be before "site" URL pattern.
+        # See https://github.com/jazzband/django-debug-toolbar/issues/529
+        urlpatterns += [
+            url(r'^__debug__/', include(debug_toolbar.urls, namespace='debug')),
+        ]
