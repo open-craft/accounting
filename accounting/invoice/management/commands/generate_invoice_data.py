@@ -18,25 +18,25 @@
 #
 
 """
-Administraion for Invoices.
+Management command for generating data (usually for a development environment) to play with.
 """
 
-from django.contrib import admin
-from simple_history.admin import SimpleHistoryAdmin
+import logging
 
-from accounting.common.admin import UuidModelAdmin
-from accounting.invoice import models
+from django.core.management import BaseCommand
 
-
-@admin.register(models.Invoice)
-class InvoiceAdmin(UuidModelAdmin, SimpleHistoryAdmin):
-    """ Admin configuration for the `Invoice` model. """
-    list_display = ('number', 'provider', 'client', 'due_date', 'paid',)
-    search_fields = ('provider__user__username', 'client__user__username',)
+LOGGER = logging.getLogger(__name__)
 
 
-@admin.register(models.LineItem)
-class LineItemAdmin(UuidModelAdmin, SimpleHistoryAdmin):
-    """ Admin configuration for the `LineItem` model. """
-    list_display = ('key', 'description', 'quantity', 'price',)
-    search_fields = ('key', 'invoice__uuid',)
+class Command(BaseCommand):
+    """
+    A management command to generate data for the Account application.
+    """
+
+    help = 'Generate data for the Invoice app, usually to play with in a development environment.'
+
+    def handle(self, *args, **options):
+        """
+        TODO: Implement.
+        """
+        pass

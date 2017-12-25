@@ -18,25 +18,20 @@
 #
 
 """
-Administraion for Invoices.
+Invoice choices.
 """
 
-from django.contrib import admin
-from simple_history.admin import SimpleHistoryAdmin
-
-from accounting.common.admin import UuidModelAdmin
-from accounting.invoice import models
+from django.utils.translation import ugettext_lazy as _
+from djchoices import ChoiceItem, DjangoChoices
 
 
-@admin.register(models.Invoice)
-class InvoiceAdmin(UuidModelAdmin, SimpleHistoryAdmin):
-    """ Admin configuration for the `Invoice` model. """
-    list_display = ('number', 'provider', 'client', 'due_date', 'paid',)
-    search_fields = ('provider__user__username', 'client__user__username',)
+class InvoiceTemplate(DjangoChoices):
+    """
+    Choices for which invoice template to use.
 
+    If adding a new template, make sure the directory & HTML/CSS file names match the choice name.
 
-@admin.register(models.LineItem)
-class LineItemAdmin(UuidModelAdmin, SimpleHistoryAdmin):
-    """ Admin configuration for the `LineItem` model. """
-    list_display = ('key', 'description', 'quantity', 'price',)
-    search_fields = ('key', 'invoice__uuid',)
+    For example, if adding a new invoice template 'stylish', name the files 'stylish.html' and 'stylish.css'
+    in directory 'stylish'.
+    """
+    Default = ChoiceItem('default', _('Default'))

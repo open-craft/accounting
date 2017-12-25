@@ -18,25 +18,30 @@
 #
 
 """
-Administraion for Invoices.
+Invoice utilities.
 """
 
-from django.contrib import admin
-from simple_history.admin import SimpleHistoryAdmin
+from datetime import timedelta
 
-from accounting.common.admin import UuidModelAdmin
-from accounting.invoice import models
+from django.utils import timezone
 
 
-@admin.register(models.Invoice)
-class InvoiceAdmin(UuidModelAdmin, SimpleHistoryAdmin):
-    """ Admin configuration for the `Invoice` model. """
-    list_display = ('number', 'provider', 'client', 'due_date', 'paid',)
-    search_fields = ('provider__user__username', 'client__user__username',)
+def get_last_day_past_month():
+    """
+    Return the `datetime` object representing the last day of the month that just passed.
+    """
+    return timezone.now().replace(day=1) - timedelta(days=1)
 
 
-@admin.register(models.LineItem)
-class LineItemAdmin(UuidModelAdmin, SimpleHistoryAdmin):
-    """ Admin configuration for the `LineItem` model. """
-    list_display = ('key', 'description', 'quantity', 'price',)
-    search_fields = ('key', 'invoice__uuid',)
+def get_first_day_past_month():
+    """
+    Return the `datetime` object representing the first day of the month that just passed.
+    """
+    return get_last_day_past_month().replace(day=1)
+
+
+def default_invoice_number():
+    """
+    Return the invoice number which defaults to `yyyy-mm` for the current year and month.
+    """
+    return timezone.now().strftime("%Y-%m")

@@ -53,6 +53,7 @@ LOCAL_APPS = (
     'accounting.common',
     'accounting.invoice',
     'accounting.registration',
+    'accounting.third_party_api',
 )
 
 INSTALLED_APPS = (

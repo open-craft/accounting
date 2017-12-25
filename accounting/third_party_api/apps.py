@@ -18,25 +18,14 @@
 #
 
 """
-Administraion for Invoices.
+Application configuration for the Third Party API app.
 """
 
-from django.contrib import admin
-from simple_history.admin import SimpleHistoryAdmin
-
-from accounting.common.admin import UuidModelAdmin
-from accounting.invoice import models
+from django.apps import AppConfig
 
 
-@admin.register(models.Invoice)
-class InvoiceAdmin(UuidModelAdmin, SimpleHistoryAdmin):
-    """ Admin configuration for the `Invoice` model. """
-    list_display = ('number', 'provider', 'client', 'due_date', 'paid',)
-    search_fields = ('provider__user__username', 'client__user__username',)
-
-
-@admin.register(models.LineItem)
-class LineItemAdmin(UuidModelAdmin, SimpleHistoryAdmin):
-    """ Admin configuration for the `LineItem` model. """
-    list_display = ('key', 'description', 'quantity', 'price',)
-    search_fields = ('key', 'invoice__uuid',)
+class ThirdPartyApiConfig(AppConfig):
+    """
+    Application configuration for the Third Party API app.
+    """
+    name = 'third_party_api'
