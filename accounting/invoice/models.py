@@ -187,18 +187,41 @@ class Invoice(UuidModel, TimeStampedModel):
             return
 
         jira = Jira()
-        for worklog in jira.tempo_worklogs(self.provider.user.username, self.billing_start_date, self.billing_end_date):
-            line_item, created = self.line_items.filter(tags__name__in=[LineItem.JIRA_TAG]).get_or_create(
+        jira_worklogs = jira.tempo_worklogs(self.provider.user.username, self.billing_start_date, self.billing_end_date)
+        jira_worklog_set = {
+            (worklog.worklog_id, worklog.issue_key, worklog.issue_title, worklog.description, worklog.time_spent,)
+            for worklog in jira_worklogs}
+        line_item_set = set(self.line_items
+                            .filter(tags__name__in=[LineItem.JIRA_TAG])
+                            .values_list('line_item_id', 'key', 'name', 'description', 'quantity',))
+
+        # Perform any deletions.
+        # Note that even if an existing worklog shares the same ID/Key as an incoming JIRA worklog, if it changed
+        # in name, description, or quantity, it will be deleted. The corresponding incoming JIRA worklog is then
+        # added right after. (See below).
+        deleted_jira_worklogs = line_item_set - jira_worklog_set
+        if deleted_jira_worklogs:
+            self.line_items.filter(
+                models.Q(line_item_id__in=[worklog[0] for worklog in deleted_jira_worklogs]) &
+                models.Q(key__in=[worklog[1] for worklog in deleted_jira_worklogs])
+            ).delete()
+
+        # Perform any additions.
+        # This performs a creation even for those worklogs that had previously existed but are now changed in
+        # some field like name, description, or quantity. But that's okay, because they were 'refreshed' by
+        # being deleted first.
+        added_jira_worklogs = jira_worklog_set - line_item_set
+        for worklog in added_jira_worklogs:
+            line_item = self.line_items.create(
                 invoice=self,
-                line_item_id=worklog.worklog_id,
-                key=worklog.issue_key,
-                name=worklog.issue_title,
-                description=worklog.description,
-                quantity=worklog.time_spent,
+                line_item_id=worklog[0],
+                key=worklog[1],
+                name=worklog[2],
+                description=worklog[3],
+                quantity=worklog[4],
                 price=self.hourly_rate.hourly_rate,
             )
-            if created:
-                line_item.tags.add(LineItem.JIRA_TAG)
+            line_item.tags.add(LineItem.JIRA_TAG)
 
     def to_pdf(self):
         """
