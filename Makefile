@@ -81,6 +81,11 @@ upgrade_dependencies: ## Upgrade to the latest dependencies.
 isort: ## Sort all imports in the project by a standard. See .isort.cfg for configuration.
 	isort --recursive accounting
 
+translations: ## Make .po files for all existing languages.
+	$(HONCHO_MANAGE) makemessages --all -v1
+
+translations.compile: ## Compile .mo files from existing .po files.
+	$(HONCHO_MANAGE) compilemessages
 # Tests #######################################################################
 
 test_quality: clean ## Run quality tests.
