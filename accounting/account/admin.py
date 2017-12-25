@@ -23,7 +23,17 @@ Administration for Account models.
 
 from django.contrib import admin
 
-from accounting.account.models import *  # pylint: disable=wildcard-import,unused-wildcard-import
+from accounting.account import models
+from accounting.common.admin import UuidModelAdmin
 
-for model in (Address, Account, HourlyRate):  # NOQA
-    admin.site.register(model)
+
+@admin.register(models.Account)
+class AccountAdmin(UuidModelAdmin):
+    """ Admin configuration for the `Account` model. """
+    list_display = ('user', 'address', 'business_name', 'occupation', 'vat',)
+
+
+@admin.register(models.HourlyRate)
+class HourlyRateAdmin(UuidModelAdmin):
+    """ Admin configuration for the `HourlyRate` model. """
+    list_display = ('hourly_rate', 'provider', 'client',)
