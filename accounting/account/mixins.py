@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # OpenCraft -- tools to aid developing and hosting free software projects
-# Copyright (C) 2015-2017 OpenCraft <contact@opencraft.com>
+# Copyright (C) 2017-2018 OpenCraft <contact@opencraft.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -21,7 +21,7 @@
 Mixins for the Account application.
 """
 
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser
 
 from accounting.account import models
 
@@ -33,14 +33,4 @@ class AccountViewMixin:
 
     lookup_field = 'user__username'
     queryset = models.Account.objects.all()
-    permission_classes = (IsAuthenticated,)
-
-
-class AddressViewMixin:
-    """
-    Mixin class adding common fields/functions for other address views to use.
-    """
-
-    lookup_field = 'accounts__user__username'
-    queryset = models.Address.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUser,)

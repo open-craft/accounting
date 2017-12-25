@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # OpenCraft -- tools to aid developing and hosting free software projects
-# Copyright (C) 2015-2017 OpenCraft <contact@opencraft.com>
+# Copyright (C) 2017-2018 OpenCraft <contact@opencraft.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -25,7 +25,7 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from accounting.account.serializers import AccountSerializer
+from accounting.common.serializers import UuidModelSerializer
 
 USER_MODEL = get_user_model()
 
@@ -62,28 +62,23 @@ class AuthTokenVerificationSerializer(serializers.Serializer):  # pylint: disabl
         return attrs
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(UuidModelSerializer):
     """
     User model serializer.
     """
 
-    account = AccountSerializer(required=False)
-
-    class Meta:
+    class Meta(UuidModelSerializer.Meta):
         model = USER_MODEL
-        fields = ('username', 'email', 'first_name', 'last_name', 'account',)
+        fields = UuidModelSerializer.Meta.fields + ('username', 'email', 'full_name',)
 
 
-class CreateUserSerializer(serializers.ModelSerializer):
+class CreateUserSerializer(UserSerializer):
     """
     User model serializer used specifically for creating new users, i.e. through registration.
     """
 
-    id = serializers.ReadOnlyField()  # pylint: disable=invalid-name
-
-    class Meta:
-        model = USER_MODEL
-        fields = ('id', 'username', 'email', 'password', 'first_name', 'last_name',)
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + ('password',)
         extra_kwargs = {
             'username': {'required': True},
             'password': {'required': True, 'write_only': True},

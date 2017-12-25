@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # OpenCraft -- tools to aid developing and hosting free software projects
-# Copyright (C) 2015-2017 OpenCraft <contact@opencraft.com>
+# Copyright (C) 2017-2018 OpenCraft <contact@opencraft.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -22,22 +22,26 @@ Accounting URL Configuration.
 """
 
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import include, static, url
 from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^account/', include('accounting.account.urls', namespace='account')),
+    url(r'^address/', include('accounting.address.urls', namespace='address')),
     url(r'^auth/', include('accounting.authentication.urls', namespace='auth')),
     url(r'^bank/', include('accounting.bank.urls', namespace='bank')),
     url(r'^invoice/', include('accounting.invoice.urls', namespace='invoice')),
     url(r'^registration/', include('accounting.registration.urls', namespace='registration')),
 ]
 
-if settings.DEBUG and settings.ENABLE_DEBUG_TOOLBAR:
-    import debug_toolbar
-    # "debug" URL pattern must be before "site" URL pattern.
-    # See https://github.com/jazzband/django-debug-toolbar/issues/529
-    urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ]
+if settings.DEBUG:
+    urlpatterns += static.static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    if settings.ENABLE_DEBUG_TOOLBAR:
+        import debug_toolbar
+        # "debug" URL pattern must be before "site" URL pattern.
+        # See https://github.com/jazzband/django-debug-toolbar/issues/529
+        urlpatterns += [
+            url(r'^__debug__/', include(debug_toolbar.urls, namespace='debug')),
+        ]

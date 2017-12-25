@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # OpenCraft -- tools to aid developing and hosting free software projects
-# Copyright (C) 2015-2017 OpenCraft <contact@opencraft.com>
+# Copyright (C) 2017-2018 OpenCraft <contact@opencraft.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -23,8 +23,8 @@ Auth URL Configuration.
 
 from django.conf.urls import url
 
-from accounting.account.urls import USERNAME_REGEX
 from accounting.authentication.views import ObtainAuthToken, RevokeAuthToken, UserView, VerifyAuthToken
+from accounting.common.urls import USERNAME_REGEX
 
 token_urlpatterns = [
     url(r'^token/obtain/', ObtainAuthToken.as_view()),

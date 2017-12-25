@@ -1,5 +1,5 @@
 # OpenCraft -- tools to aid developing and hosting free software projects
-# Copyright (C) 2015-2017 OpenCraft <contact@opencraft.com>
+# Copyright (C) 2017-2018 OpenCraft <contact@opencraft.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -18,10 +18,10 @@
 dev.build: ## Build containers.
 	docker-compose build
 
-dev.up: ## Bring up all containers.
+dev.up: static translations.compile ## Bring up all containers.
 	docker-compose up -d
 
-dev.%.up: ## Bring up a specific container.
+dev.%.up: static translations.compile ## Bring up a specific container.
 	docker-compose up $*
 
 dev.down: ## Bring down all containers.
