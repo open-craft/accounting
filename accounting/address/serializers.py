@@ -18,35 +18,25 @@
 #
 
 """
-Bank serializers.
+Address serializers.
 """
 
-from rest_framework import serializers
-
-from accounting.address.serializers import AddressSerializer
-from accounting.bank import models
+from accounting.address import models
+from accounting.common.serializers import UuidModelSerializer
 
 
-class BankSerializer(serializers.ModelSerializer):
+class AddressSerializer(UuidModelSerializer):
     """
-    Bank model serializer.
+    Address model serializer.
     """
 
-    address = AddressSerializer(required=False)
-
-    class Meta:
-        model = models.Bank
-        fields = ('uuid', 'name', 'address',)
-
-
-class BankAccountSerializer(serializers.ModelSerializer):
-    """
-    Bank Account serializer.
-    """
-
-    bank = BankSerializer()
-
-    class Meta:
-        model = models.BankAccount
-        fields = ('uuid', 'bank', 'currency', 'type', 'iban', 'bic', 'abn', 'bsb', 'vat',
-                  'account_number', 'routing_number',)
+    class Meta(UuidModelSerializer.Meta):
+        model = models.Address
+        fields = (UuidModelSerializer.Meta.fields +
+                  ('country', 'address_line1', 'address_line2', 'zipcode', 'city', 'state',))
+        extra_kwargs = {
+            'country': {'required': True},
+            'address_line1': {'required': True},
+            'zipcode': {'required': True},
+            'city': {'required': True},
+        }

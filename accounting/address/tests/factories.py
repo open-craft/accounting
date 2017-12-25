@@ -18,35 +18,26 @@
 #
 
 """
-Bank serializers.
+Factories for testing the Address application.
 """
 
-from rest_framework import serializers
+from uuid import uuid4
 
-from accounting.address.serializers import AddressSerializer
-from accounting.bank import models
+import factory
 
-
-class BankSerializer(serializers.ModelSerializer):
-    """
-    Bank model serializer.
-    """
-
-    address = AddressSerializer(required=False)
-
-    class Meta:
-        model = models.Bank
-        fields = ('uuid', 'name', 'address',)
+from accounting.account import models
 
 
-class BankAccountSerializer(serializers.ModelSerializer):
-    """
-    Bank Account serializer.
-    """
+class AddressFactory(factory.DjangoModelFactory):
+    """ Factory for `models.Address`. """
 
-    bank = BankSerializer()
+    uuid = factory.LazyFunction(uuid4)
+    country = factory.Faker('country_code')
+    address_line1 = factory.Faker('address')
+    address_line2 = factory.Faker('address')
+    zipcode = factory.Faker('zipcode')
+    city = factory.Faker('city')
+    state = factory.Faker('state')
 
     class Meta:
-        model = models.BankAccount
-        fields = ('uuid', 'bank', 'currency', 'type', 'iban', 'bic', 'abn', 'bsb', 'vat',
-                  'account_number', 'routing_number',)
+        model = models.Address

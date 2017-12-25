@@ -7,7 +7,6 @@ from decimal import Decimal
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import django_countries.fields
 import djmoney.models.fields
 
 
@@ -17,6 +16,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('address', '0001_initial'),
     ]
 
     operations = [
@@ -33,22 +33,6 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Address',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('country', django_countries.fields.CountryField(help_text='The country associated with this user account.', max_length=2)),
-                ('address_line1', models.CharField(help_text='The first address line used to appear on accounting documents, i.e. invoices.', max_length=128)),
-                ('address_line2', models.CharField(blank=True, help_text='Additional line for extending an address.', max_length=128, null=True)),
-                ('zipcode', models.CharField(help_text='A 5-digit or ZIP+4 zipcode. Example: 12345, 12345-6789.', max_length=10)),
-                ('city', models.CharField(help_text='The city associated with this user account.', max_length=60)),
-                ('state', models.CharField(blank=True, help_text='The state or province associated with this user account. Required if country is US, CA, AU, or BR.', max_length=80, null=True)),
-            ],
-            options={
-                'verbose_name': 'Address',
-                'verbose_name_plural': 'Addresses',
-            },
-        ),
-        migrations.CreateModel(
             name='HourlyRate',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -61,11 +45,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Hourly Rate',
                 'verbose_name_plural': 'Hourly Rates',
             },
-        ),
-        migrations.AddField(
-            model_name='account',
-            name='address',
-            field=models.ForeignKey(help_text='The address of this user.', on_delete=django.db.models.deletion.CASCADE, related_name='accounts', to='account.Address'),
         ),
         migrations.AddField(
             model_name='account',

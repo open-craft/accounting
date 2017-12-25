@@ -18,35 +18,19 @@
 #
 
 """
-Bank serializers.
+Mixins for the Address application.
 """
 
-from rest_framework import serializers
+from rest_framework.permissions import IsAuthenticated
 
-from accounting.address.serializers import AddressSerializer
-from accounting.bank import models
+from accounting.address import models
 
 
-class BankSerializer(serializers.ModelSerializer):
+class AddressViewMixin:
     """
-    Bank model serializer.
-    """
-
-    address = AddressSerializer(required=False)
-
-    class Meta:
-        model = models.Bank
-        fields = ('uuid', 'name', 'address',)
-
-
-class BankAccountSerializer(serializers.ModelSerializer):
-    """
-    Bank Account serializer.
+    Mixin class adding common fields/functions for other address views to use.
     """
 
-    bank = BankSerializer()
-
-    class Meta:
-        model = models.BankAccount
-        fields = ('uuid', 'bank', 'currency', 'type', 'iban', 'bic', 'abn', 'bsb', 'vat',
-                  'account_number', 'routing_number',)
+    lookup_field = 'accounts__user__username'
+    queryset = models.Address.objects.all()
+    permission_classes = (IsAuthenticated,)

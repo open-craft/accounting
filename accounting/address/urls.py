@@ -18,31 +18,19 @@
 #
 
 """
-Account URL Configuration.
+Address URL Configuration.
 """
 
 from django.conf.urls import url
 
-from accounting.account import views
+from accounting.address import views
+from accounting.common.urls import USERNAME_REGEX
 
-USERNAME_REGEX = r'[\w.@_+-]+'
-ACCOUNT_PATH_REGEX = r'(?P<user__username>{username})'.format(username=USERNAME_REGEX)
-HOURLY_RATE_PATH_REGEX = (r'rate/'
-                          r'(?P<provider__user__username>{username})/'
-                          r'(?P<client__user__username>{username})'.format(username=USERNAME_REGEX))
+ADDRESS_PATH_REGEX = (r'(?P<accounts__user__username>{username})'.format(username=USERNAME_REGEX))
 
-account_urlpatterns = [
+urlpatterns = [
     url(r'^create/$',
-        views.CreateAccountView.as_view()),
-    url(r'^{account_path_regex}/$'.format(account_path_regex=ACCOUNT_PATH_REGEX),
-        views.AccountView.as_view()),
+        views.AddressView.as_view()),
+    url(r'^{address_path_regex}/$'.format(address_path_regex=ADDRESS_PATH_REGEX),
+        views.AddressView.as_view()),
 ]
-
-hourly_rate_urlpatterns = [
-    url(r'^rate/create/$',
-        views.CreateHourlyRateView.as_view()),
-    url(r'^{hourly_rate_path_regex}/$'.format(hourly_rate_path_regex=HOURLY_RATE_PATH_REGEX),
-        views.HourlyRateView.as_view()),
-]
-
-urlpatterns = account_urlpatterns + hourly_rate_urlpatterns

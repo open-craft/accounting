@@ -47,6 +47,7 @@ ALLOWED_HOSTS = env.json('ALLOWED_HOSTS', default=[])
 
 LOCAL_APPS = (
     'accounting.account',
+    'accounting.address',
     'accounting.authentication',
     'accounting.bank',
     'accounting.invoice',

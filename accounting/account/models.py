@@ -24,48 +24,9 @@ Account models used for user accounts in the Accounting service.
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django_countries.fields import CountryField
 from djmoney.models.fields import MoneyField
 
 USER_MODEL = get_user_model()
-
-
-class Address(models.Model):
-    """
-    An address holding generic locational information.
-    """
-
-    country = CountryField(
-        help_text=_("The country associated with this user account."))
-    address_line1 = models.CharField(
-        max_length=128,
-        help_text=_("The first address line used to appear on accounting documents, i.e. invoices."))
-    address_line2 = models.CharField(
-        max_length=128, blank=True, null=True,
-        help_text=_("Additional line for extending an address."))
-    zipcode = models.CharField(
-        max_length=10,
-        help_text=_("A 5-digit or ZIP+4 zipcode. Example: 12345, 12345-6789."))
-    city = models.CharField(
-        max_length=60,
-        help_text=_("The city associated with this user account."))
-    state = models.CharField(
-        max_length=80, blank=True, null=True,
-        help_text=_("The state or province associated with this user account. "
-                    "Required if country is US, CA, AU, or BR."))
-
-    class Meta:
-        verbose_name = _('Address')
-        verbose_name_plural = _('Addresses')
-
-    def __str__(self):
-        """
-        Return a string identifying this address object.
-        """
-        # TODO: Handle the case where non-required values are missing, like `state` and `address_line2`.
-        return '{} {}, {} {} {}, {}'.format(
-            self.address_line1, self.address_line2, self.city, self.state, self.zipcode, self.country
-        )
 
 
 class Account(models.Model):

@@ -18,35 +18,14 @@
 #
 
 """
-Bank serializers.
+Application configuration for the Address application.
 """
 
-from rest_framework import serializers
-
-from accounting.address.serializers import AddressSerializer
-from accounting.bank import models
+from django.apps import AppConfig
 
 
-class BankSerializer(serializers.ModelSerializer):
+class AddressConfig(AppConfig):
     """
-    Bank model serializer.
+    Configuration for the Address application.
     """
-
-    address = AddressSerializer(required=False)
-
-    class Meta:
-        model = models.Bank
-        fields = ('uuid', 'name', 'address',)
-
-
-class BankAccountSerializer(serializers.ModelSerializer):
-    """
-    Bank Account serializer.
-    """
-
-    bank = BankSerializer()
-
-    class Meta:
-        model = models.BankAccount
-        fields = ('uuid', 'bank', 'currency', 'type', 'iban', 'bic', 'abn', 'bsb', 'vat',
-                  'account_number', 'routing_number',)
+    name = 'address'

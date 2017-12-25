@@ -28,6 +28,7 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^account/', include('accounting.account.urls', namespace='account')),
+    url(r'^address/', include('accounting.address.urls', namespace='address')),
     url(r'^auth/', include('accounting.authentication.urls', namespace='auth')),
     url(r'^bank/', include('accounting.bank.urls', namespace='bank')),
     url(r'^invoice/', include('accounting.invoice.urls', namespace='invoice')),

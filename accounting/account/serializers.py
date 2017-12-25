@@ -30,24 +30,6 @@ from accounting.bank.serializers import BankAccountSerializer
 USER_MODEL = get_user_model()
 
 
-class AddressSerializer(serializers.ModelSerializer):
-    """
-    Address model serializer.
-    """
-
-    id = serializers.ReadOnlyField()  # pylint: disable=invalid-name
-
-    class Meta:
-        model = models.Address
-        fields = ('id', 'country', 'address_line1', 'address_line2', 'zipcode', 'city', 'state',)
-        extra_kwargs = {
-            'country': {'required': True},
-            'address_line1': {'required': True},
-            'zipcode': {'required': True},
-            'city': {'required': True},
-        }
-
-
 class HourlyRateAccountSerializer(serializers.ModelSerializer):
     """
     Account serializer to be used by the hourly rate serializer.

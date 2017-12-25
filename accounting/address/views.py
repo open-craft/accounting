@@ -18,35 +18,18 @@
 #
 
 """
-Bank serializers.
+Address views.
 """
 
-from rest_framework import serializers
+from rest_framework.generics import CreateAPIView, RetrieveAPIView
 
-from accounting.address.serializers import AddressSerializer
-from accounting.bank import models
+from accounting.account import serializers
+from accounting.address.mixins import AddressViewMixin
 
 
-class BankSerializer(serializers.ModelSerializer):
+class AddressView(AddressViewMixin, CreateAPIView, RetrieveAPIView):
     """
-    Bank model serializer.
-    """
-
-    address = AddressSerializer(required=False)
-
-    class Meta:
-        model = models.Bank
-        fields = ('uuid', 'name', 'address',)
-
-
-class BankAccountSerializer(serializers.ModelSerializer):
-    """
-    Bank Account serializer.
+    A view for retrieving and updating `Address` objects.
     """
 
-    bank = BankSerializer()
-
-    class Meta:
-        model = models.BankAccount
-        fields = ('uuid', 'bank', 'currency', 'type', 'iban', 'bic', 'abn', 'bsb', 'vat',
-                  'account_number', 'routing_number',)
+    serializer_class = serializers.AddressSerializer

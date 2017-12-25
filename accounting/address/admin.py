@@ -18,35 +18,16 @@
 #
 
 """
-Bank serializers.
+Address admin.
 """
 
-from rest_framework import serializers
+from django.contrib import admin
 
-from accounting.address.serializers import AddressSerializer
-from accounting.bank import models
-
-
-class BankSerializer(serializers.ModelSerializer):
-    """
-    Bank model serializer.
-    """
-
-    address = AddressSerializer(required=False)
-
-    class Meta:
-        model = models.Bank
-        fields = ('uuid', 'name', 'address',)
+from accounting.address import models
+from accounting.common.admin import UuidModelAdmin
 
 
-class BankAccountSerializer(serializers.ModelSerializer):
-    """
-    Bank Account serializer.
-    """
-
-    bank = BankSerializer()
-
-    class Meta:
-        model = models.BankAccount
-        fields = ('uuid', 'bank', 'currency', 'type', 'iban', 'bic', 'abn', 'bsb', 'vat',
-                  'account_number', 'routing_number',)
+@admin.register(models.Address)
+class AddressAdmin(UuidModelAdmin):
+    """ Admin configuration for the `Address` model. """
+    list_display = ('country', 'address_line1', 'address_line2', 'zipcode', 'city', 'state',)

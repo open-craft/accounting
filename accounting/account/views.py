@@ -28,11 +28,11 @@ TODO:    It will require a new permission class to check if the token matches th
 """
 
 from django.contrib.auth import get_user_model
-from rest_framework.generics import CreateAPIView, RetrieveAPIView, RetrieveUpdateAPIView, get_object_or_404
+from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 
 from accounting.account import models, serializers
-from accounting.account.mixins import AccountViewMixin, AddressViewMixin
+from accounting.account.mixins import AccountViewMixin
 
 USER_MODEL = get_user_model()
 
@@ -53,14 +53,6 @@ class CreateAccountView(AccountViewMixin, CreateAPIView):
     """
 
     serializer_class = serializers.CreateAccountSerializer
-
-
-class AddressView(AddressViewMixin, CreateAPIView, RetrieveAPIView):
-    """
-    A view for retrieving and updating `Address` objects.
-    """
-
-    serializer_class = serializers.AddressSerializer
 
 
 class HourlyRateView(RetrieveUpdateAPIView):
