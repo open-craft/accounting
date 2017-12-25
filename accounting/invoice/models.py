@@ -278,13 +278,15 @@ class Invoice(UuidModel, TimeStampedModel):
             |- 2016
             |- 2017
             |   |- blah
+            |   |- ...
             |   |- invoices-in
             |   |   |- 1
             |   |   |- 2
             |   |   |- ...
             |   |   |- 12
-            |   |       |- invoice.pdf
-            |   |- invoices-out
+            |   |   |   |- invoice_1.pdf
+            |   |   |   |- ...
+            |   |   |   |- invoice_n.pdf
             |- 2018
 
         TODO: This should be a synchronous job on a non-web worker.
