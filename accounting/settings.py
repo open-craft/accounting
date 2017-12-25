@@ -58,16 +58,19 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
     'django.contrib.staticfiles',
 
     'django_countries',
     'django_extensions',
     'djmoney',
     'huey.contrib.djhuey',
-    'localflavor',
     'rest_framework',
     'rest_framework.authtoken',
+    'rosetta',
     'simple_email_confirmation',
+    'simple_history',
+    'taggit',
     'vies',
 ) + LOCAL_APPS
 
@@ -79,6 +82,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 if DEBUG and ENABLE_DEBUG_TOOLBAR:
@@ -151,10 +155,22 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+LOCALE_PATHS = (
+    root('accounting/conf/locale'),
+)
 
 # Static files (CSS, JavaScript, Images) ######################################
 
 STATIC_URL = '/static/'
+STATIC_ROOT = root('static')
+STATICFILES_DIRS = (
+    root('accounting/static'),
+)
+
+# Media (File Uploads) ########################################################
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = root('media')
 
 # Django-extensions ###########################################################
 
@@ -213,6 +229,83 @@ SIMPLE_EMAIL_CONFIRMATION_AUTO_ADD = False
 
 ADMINS = env.json('ADMINS', default=set())
 
+# LOGGING #####################################################################
+
+BASE_HANDLERS = env.json('BASE_HANDLERS', default=["accounting"])
+HANDLERS = BASE_HANDLERS
+LOGGING_ROTATE_MAX_KBYTES = env.json('LOGGING_ROTATE_MAX_KBYTES', default=10 * 1024)
+LOGGING_ROTATE_MAX_FILES = env.json('LOGGING_ROTATE_MAX_FILES', default=60)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': "{asctime} | {levelname:>8.8s} | process={process:<5d} | {name:<25.25s} | {message}",
+            'style': '{',
+            'datefmt': "%d/%b/%Y %H:%M:%S"
+        },
+        'db': {
+            'format': "{name:<25.25s} | {message}",
+            'style': '{',
+            'datefmt': "%d/%b/%Y %H:%M:%S"
+        },
+    },
+    'handlers': {
+        'accounting': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': HANDLERS,
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+        'django': {
+            'handlers': HANDLERS,
+            'propagate': False,
+            'level': 'INFO',
+        },
+        'accounting': {
+            'handlers': HANDLERS,
+            'propagate': False,
+            'level': 'DEBUG',
+        },
+        'requests': {
+            'handlers': HANDLERS,
+            'propagate': False,
+            'level': 'DEBUG',
+        },
+        'requests.packages.urllib3': {
+            'handlers': HANDLERS,
+            'propagate': False,
+            'level': 'WARNING',
+        }
+    }
+}
+
 # MONEY #######################################################################
 
 DEFAULT_CURRENCY = 'EUR'
+
+# JIRA ########################################################################
+
+ENABLE_JIRA = env.bool('ENABLE_JIRA', default=False)
+JIRA_SERVER_URL = env('JIRA_SERVER_URL', default='https://jira.atlassian.com')
+JIRA_SERVICE_USER_USERNAME = env('JIRA_SERVICE_USER_USERNAME', default='')
+JIRA_SERVICE_USER_PASSWORD = env('JIRA_SERVICE_USER_PASSWORD', default='')
+
+# GOOGLE ######################################################################
+
+ENABLE_GOOGLE = env.bool('ENABLE_GOOGLE', default=False)
+GOOGLE_AUTH_CLIENT_USER_EMAIL = env('GOOGLE_AUTH_CLIENT_USER_EMAIL', default='')
+GOOGLE_AUTH_CLIENT_SERVICE_EMAIL = env('GOOGLE_AUTH_CLIENT_SERVICE_EMAIL', default='')
+GOOGLE_AUTH_PKCS12_FILE_PATH = env('GOOGLE_AUTH_PKCS12_FILE_PATH', default=root('.p12'))
+GOOGLE_DRIVE_ROOT = env('GOOGLE_DRIVE_ROOT', default='')
+
+# HTML-to-PDF #################################################################
+
+INVOICE_PDF_PATH = env('INVOICE_PDF_PATH', default=MEDIA_ROOT)
+HTML_TO_PDF_BINARY_PATH = env('HTML_TO_PDF_BINARY_PATH', default=root('wkhtmltopdf'))
