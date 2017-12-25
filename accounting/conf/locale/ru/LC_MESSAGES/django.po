@@ -1,0 +1,412 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-24 22:21+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: accounting/account/models.py:47
+msgid "The authentication user linked to this account."
+msgstr ""
+
+#: accounting/account/models.py:50
+msgid "The address of this user."
+msgstr ""
+
+#: accounting/account/models.py:53
+msgid "The name of the business or company associated with this account."
+msgstr ""
+
+#: accounting/account/models.py:56
+msgid ""
+"The occupation of the user of this account. Required if country is US, CA, "
+"or JP."
+msgstr ""
+
+#: accounting/account/models.py:60
+msgid ""
+"The Value Added Tax identification number used in and required by some "
+"countries. This can also be used to store a General Sales Tax (GST) "
+"identification number."
+msgstr ""
+
+#: accounting/account/models.py:73
+msgid "The hourly rate the user charges clients."
+msgstr ""
+
+#: accounting/account/models.py:76
+msgid "Account"
+msgstr ""
+
+#: accounting/account/models.py:77
+msgid "Accounts"
+msgstr ""
+
+#: accounting/account/models.py:105
+msgid "The hourly rate charged between a provider and client."
+msgstr ""
+
+#: accounting/account/models.py:108
+msgid ""
+"The account linked to the user who gets paid the hourly rate by the client."
+msgstr ""
+
+#: accounting/account/models.py:111
+msgid ""
+"The account linked to the user who pays the hourly rate to the provider."
+msgstr ""
+
+#: accounting/account/models.py:114
+msgid "Hourly Rate"
+msgstr ""
+
+#: accounting/account/models.py:115
+msgid "Hourly Rates"
+msgstr ""
+
+#: accounting/address/models.py:37
+msgid "The country associated with this user account."
+msgstr ""
+
+#: accounting/address/models.py:40
+msgid ""
+"The first address line used to appear on accounting documents, i.e. invoices."
+msgstr ""
+
+#: accounting/address/models.py:43
+msgid "Additional line for extending an address."
+msgstr ""
+
+#: accounting/address/models.py:46
+msgid "A 5-digit or ZIP+4 zipcode. Example: 12345, 12345-6789."
+msgstr ""
+
+#: accounting/address/models.py:49
+msgid "The city associated with this user account."
+msgstr ""
+
+#: accounting/address/models.py:52
+msgid ""
+"The state or province associated with this user account. Required if country "
+"is US, CA, AU, or BR."
+msgstr ""
+
+#: accounting/address/models.py:56
+msgid "Address"
+msgstr ""
+
+#: accounting/address/models.py:57
+msgid "Addresses"
+msgstr ""
+
+#: accounting/authentication/admin.py:37
+msgid "Personal info"
+msgstr ""
+
+#: accounting/authentication/admin.py:38
+msgid "Permissions"
+msgstr ""
+
+#: accounting/authentication/admin.py:39
+msgid "Important dates"
+msgstr ""
+
+#: accounting/authentication/models.py:38
+msgid "The full name of this user."
+msgstr ""
+
+#: accounting/authentication/models.py:47
+msgid "User"
+msgstr ""
+
+#: accounting/authentication/models.py:48
+msgid "Users"
+msgstr ""
+
+#: accounting/authentication/serializers.py:38
+msgid "Username"
+msgstr ""
+
+#: accounting/authentication/serializers.py:39
+msgid "Token"
+msgstr ""
+
+#: accounting/authentication/serializers.py:52
+msgid "User {} is not active."
+msgstr ""
+
+#: accounting/authentication/serializers.py:55
+msgid "No such user with username {} and token {}."
+msgstr ""
+
+#: accounting/authentication/serializers.py:58
+msgid "Must include \"username\" and \"token\"."
+msgstr ""
+
+#: accounting/bank/choices.py:35
+msgid "BIC"
+msgstr ""
+
+#: accounting/bank/choices.py:36
+msgid "IBAN"
+msgstr ""
+
+#: accounting/bank/choices.py:37 accounting/bank/choices.py:47
+msgid "Routing Number"
+msgstr ""
+
+#: accounting/bank/choices.py:38
+msgid "Account Number"
+msgstr ""
+
+#: accounting/bank/choices.py:39
+msgid "Bank Code"
+msgstr ""
+
+#: accounting/bank/choices.py:40
+msgid "Bank Giro Number"
+msgstr ""
+
+#: accounting/bank/choices.py:41
+msgid "Bank Branch Code"
+msgstr ""
+
+#: accounting/bank/choices.py:42
+msgid "BSB Code"
+msgstr ""
+
+#: accounting/bank/choices.py:43
+msgid "Union Pay Card Number"
+msgstr ""
+
+#: accounting/bank/choices.py:44
+msgid "CLABE"
+msgstr ""
+
+#: accounting/bank/choices.py:45
+msgid "IFSC Code"
+msgstr ""
+
+#: accounting/bank/choices.py:46
+msgid "Canadian Institution Number"
+msgstr ""
+
+#: accounting/bank/choices.py:48
+msgid "Bank Sort Code"
+msgstr ""
+
+#: accounting/bank/choices.py:49
+msgid "Bank SWIFT Code"
+msgstr ""
+
+#: accounting/bank/choices.py:50
+msgid "Transit Number"
+msgstr ""
+
+#: accounting/bank/choices.py:57
+msgid "Checking Account"
+msgstr ""
+
+#: accounting/bank/choices.py:58
+msgid "Savings Account"
+msgstr ""
+
+#: accounting/bank/models.py:41
+msgid "The official name of the bank."
+msgstr ""
+
+#: accounting/bank/models.py:44
+msgid "The address of this bank."
+msgstr ""
+
+#: accounting/bank/models.py:47
+msgid "Bank"
+msgstr ""
+
+#: accounting/bank/models.py:48
+msgid "Banks"
+msgstr ""
+
+#: accounting/bank/models.py:76
+msgid "The bank to which this bank account belongs."
+msgstr ""
+
+#: accounting/bank/models.py:79
+msgid ""
+"The user account that this bank account is linked to. A user can have "
+"multiple bank accounts associated with their user account."
+msgstr ""
+
+#: accounting/bank/models.py:82
+msgid "The currency expected to be held in this bank account."
+msgstr ""
+
+#: accounting/bank/models.py:85
+msgid "Whether this is a checking or savings account."
+msgstr ""
+
+#: accounting/bank/models.py:88
+msgid ""
+"The unique combination of identification information for this bank account."
+msgstr ""
+
+#: accounting/bank/models.py:91
+msgid "Bank Account"
+msgstr ""
+
+#: accounting/bank/models.py:92
+msgid "Bank Accounts"
+msgstr ""
+
+#: accounting/common/models.py:36
+msgid "UUID"
+msgstr ""
+
+#: accounting/common/models.py:37
+msgid "The universally unique identifier for this model instance."
+msgstr ""
+
+#: accounting/invoice/choices.py:37
+msgid "Default"
+msgstr ""
+
+#: accounting/invoice/models.py:79
+msgid ""
+"The unique invoice number. Defaults to yyyy-mm for the current year and "
+"month."
+msgstr ""
+
+#: accounting/invoice/models.py:83
+msgid ""
+"The date this invoice was created and sent for billing purposes. Defaults to "
+"right now, but can be changed."
+msgstr ""
+
+#: accounting/invoice/models.py:87
+msgid ""
+"The first date for which the line items in this invoice were provided. "
+"Defaults to the first day of the past month."
+msgstr ""
+
+#: accounting/invoice/models.py:91
+msgid ""
+"The last date for which the line items in this invoice were provided. "
+"Defaults to the last day of the past month."
+msgstr ""
+
+#: accounting/invoice/models.py:95
+msgid "When this invoice should be paid."
+msgstr ""
+
+#: accounting/invoice/models.py:98
+msgid "The invoicing service/product provider."
+msgstr ""
+
+#: accounting/invoice/models.py:101
+msgid "The client being invoiced for services/products."
+msgstr ""
+
+#: accounting/invoice/models.py:104
+msgid "Whether this invoice has been paid by the client yet or not."
+msgstr ""
+
+#: accounting/invoice/models.py:107
+msgid ""
+"Any arbitrary extra text that the provider would like to display on their "
+"invoice. Each template has a designated location to place this extra text."
+msgstr ""
+
+#: accounting/invoice/models.py:111
+msgid "The provider's signature."
+msgstr ""
+
+#: accounting/invoice/models.py:114
+msgid "The template to use to generate this invoice."
+msgstr ""
+
+#: accounting/invoice/models.py:121
+msgid ""
+"Whether this invoice should automatically download JIRA worklogs for the "
+"provider to fill up the invoice."
+msgstr ""
+
+#: accounting/invoice/models.py:125
+msgid "Whether this invoice should be converted to a PDF on save."
+msgstr ""
+
+#: accounting/invoice/models.py:128
+msgid ""
+"Whether this invoice should be uploaded to Google Drive when converted to a "
+"PDF on save."
+msgstr ""
+
+#: accounting/invoice/models.py:131
+msgid "Invoice"
+msgstr ""
+
+#: accounting/invoice/models.py:132
+msgid "Invoices"
+msgstr ""
+
+#: accounting/invoice/models.py:318
+msgid "The invoice to which this line item belongs."
+msgstr ""
+
+#: accounting/invoice/models.py:320
+msgid ""
+"A non-auto-incrementing ID used for line items with the same fields for when "
+"the items may be the same or different. For example: a line item may have "
+"the exact same descriptive fields but still be a separate physical item, in "
+"which case a UUID or auto-incrementing ID would not suffice to tell the "
+"difference."
+msgstr ""
+
+#: accounting/invoice/models.py:327
+msgid "The key identifier for this line item. For example: OC-9999."
+msgstr ""
+
+#: accounting/invoice/models.py:331
+msgid "What the item is."
+msgstr ""
+
+#: accounting/invoice/models.py:334
+msgid ""
+"What this line item is about. Optional: this will only display on invoices "
+"that have the description column."
+msgstr ""
+
+#: accounting/invoice/models.py:338
+msgid "How many of these items should be billed."
+msgstr ""
+
+#: accounting/invoice/models.py:341
+msgid "How much each unit of this line item costs, including the currency."
+msgstr ""
+
+#: accounting/invoice/models.py:344
+msgid ""
+"A special tag for this line item. Can be used to group line items by tag."
+msgstr ""
+
+#: accounting/invoice/models.py:347
+msgid "Line Item"
+msgstr ""
+
+#: accounting/invoice/models.py:348
+msgid "Line Items"
+msgstr ""
