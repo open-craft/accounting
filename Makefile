@@ -30,8 +30,8 @@ HONCHO_MANAGE_TESTS := honcho -e .environ/.env.test run python3 manage.py
 
 # Parameters ##################################################################
 
-# For `test_one` use the rest as arguments and turn them into do-nothing targets
-ifeq ($(firstword $(MAKECMDGOALS)),$(filter $(firstword $(MAKECMDGOALS)),test_one manage))
+# For `test.one` use the rest as arguments and turn them into do-nothing targets
+ifeq ($(firstword $(MAKECMDGOALS)),$(filter $(firstword $(MAKECMDGOALS)),test.one manage))
   RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
   $(eval $(RUN_ARGS):;@:)
 endif
@@ -54,29 +54,33 @@ install_system_dependencies: apt_get_update ## Install system-level dependencies
 .PHONY: static
 static: ## Collect static files for production.
 	$(HONCHO_MANAGE) collectstatic --clear --no-input
+
 manage: ## Run a management command.
 	$(HONCHO_MANAGE) $(RUN_ARGS)
 
 migrate: clean ## Run migrations.
 	$(HONCHO_MANAGE) migrate
 
-migration_check: clean ## Check for unapplied migrations.
+migrations.check: clean ## Check for unapplied migrations.
 	@!(($(HONCHO_MANAGE) showmigrations | grep '\[ \]') && printf "\n\033[0;31mERROR: Pending migrations found\033[0m\n\n")
 
-migration_autogen: clean ## Generate migrations.
+migrations: clean ## Generate migrations.
 	$(HONCHO_MANAGE) makemigrations
 
-run: clean migration_check ## Run the accounting service in a production setting with concurrency.
+run: clean migrations.check static translations.compile ## Run the accounting service in a production setting with concurrency.
 	honcho start --port 1786 --concurrency "worker=$(WORKERS),worker_low_priority=$(WORKERS_LOW_PRIORITY)"
 
-rundev: clean migration_check ## Run the developmental server using `runserver_plus`. Different than docker.
+run.dev: clean migrations.check static translations.compile ## Run the developmental server using `runserver_plus`. Different than docker.
 	honcho start --port 1786 -f Procfile.dev
 
 shell: ## Start the power shell.
 	HUEY_QUEUE_NAME=accounting_low_priority $(HONCHO_MANAGE) shell_plus
 
-upgrade_dependencies: ## Upgrade to the latest dependencies.
-	pip freeze --local | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip install -U
+requirements.upgrade: ## Upgrade to the latest dependencies.
+	pip-compile
+
+requirements.update: ## Update your virtualenv requirements to perfectly match what's required by the service
+	pip-sync
 
 isort: ## Sort all imports in the project by a standard. See .isort.cfg for configuration.
 	isort --recursive accounting
@@ -86,26 +90,26 @@ translations: ## Make .po files for all existing languages.
 
 translations.compile: ## Compile .mo files from existing .po files.
 	$(HONCHO_MANAGE) compilemessages
+
 # Tests #######################################################################
 
-test_quality: clean ## Run quality tests.
+test.quality: clean ## Run quality tests.
 	isort --check-only --recursive accounting
 	prospector --profile accounting --uses django
 
-test_migrations_missing: clean ## Check if migrations are missing.
+test.migrations_missing: clean ## Check if migrations are missing.
 	@$(HONCHO_MANAGE_TESTS) makemigrations --dry-run --check
 
-test_one: clean ## Run tests for a specific path.
+test.one: clean ## Run tests for a specific path.
 	$(HONCHO_MANAGE_TESTS) test $(RUN_ARGS)
 
-# TODO: Temporarily 'ok' with 0 coverage. Raise it when we write tests for the first time.
-test_unit: clean ## Run all unit tests.
+test.unit: clean ## Run all unit tests.
 	@honcho -e .environ/.env.test run coverage run --source='.' --omit='*/tests/*' ./manage.py test --noinput
 	coverage html
 	@echo "\nCoverage HTML report at file://`pwd`/build/coverage/index.html\n"
 	@coverage report --fail-under $(COVERAGE_THRESHOLD) || (echo "\nERROR: Coverage is below $(COVERAGE_THRESHOLD)%\n" && exit 2)
 
-test: clean test_quality test_unit test_migrations_missing ## Run all tests.
+test: clean test.quality test.unit test.migrations_missing ## Run all tests.
 	@echo "\nAll tests OK!\n"
 
 # We ignore `private.mk` so you can define your own make targets, or override some.
