@@ -18,10 +18,10 @@
 dev.build: ## Build containers.
 	docker-compose build
 
-dev.up: ## Bring up all containers.
+dev.up: static translations.compile ## Bring up all containers.
 	docker-compose up -d
 
-dev.%.up: ## Bring up a specific container.
+dev.%.up: static translations.compile ## Bring up a specific container.
 	docker-compose up $*
 
 dev.down: ## Bring down all containers.

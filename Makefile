@@ -51,6 +51,9 @@ clean: ## Remove all temporary files.
 install_system_dependencies: apt_get_update ## Install system-level dependencies from `debian_packages.lst`.
 	sudo -E apt-get install -y `tr -d '\r' < debian_packages.lst`
 
+.PHONY: static
+static: ## Collect static files for production.
+	$(HONCHO_MANAGE) collectstatic --clear --no-input
 manage: ## Run a management command.
 	$(HONCHO_MANAGE) $(RUN_ARGS)
 
