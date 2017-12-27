@@ -23,8 +23,8 @@ Bank application models.
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from djmoney.models.fields import CurrencyField
 from django_extensions.db.fields.json import JSONField
+from djmoney.models.fields import CurrencyField
 
 from accounting.account.models import Account, Address
 from accounting.bank.choices import BankAccountIdentifiers, BankAccountType
