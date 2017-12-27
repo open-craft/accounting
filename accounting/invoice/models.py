@@ -40,7 +40,6 @@ from taggit.managers import TaggableManager
 import pdfkit
 
 from accounting.account.models import Account
-from accounting.bank.choices import BankAccountIdentifiers
 from accounting.common.models import UuidModel
 from accounting.invoice import utils
 from accounting.invoice.choices import InvoiceTemplate
@@ -71,7 +70,7 @@ class Invoice(UuidModel, TimeStampedModel):
         'margin-right': '0mm',
         'margin-bottom': '10mm',
         'margin-left': '0mm',
-        'encoding': "UTF-8",
+        'encoding': 'UTF-8',
     }
 
     number = models.CharField(
@@ -105,7 +104,7 @@ class Invoice(UuidModel, TimeStampedModel):
     extra_text = models.TextField(
         blank=True, null=True,
         help_text=_("Any arbitrary extra text that the provider would like to display on their invoice. "
-                    "Each template has a designated location to place this extra text."))
+                    "Each template should have a designated location to place this extra text."))
     signature = models.ImageField(
         blank=True, null=True,
         help_text=_("The provider's signature."))
@@ -120,7 +119,7 @@ class Invoice(UuidModel, TimeStampedModel):
         default=False,
         help_text=_("Whether this invoice should automatically download JIRA worklogs "
                     "for the provider to fill up the invoice."))
-    auto_pdf_on_save = models.BooleanField(
+    auto_create_pdf_on_save = models.BooleanField(
         default=False,
         help_text=_("Whether this invoice should be converted to a PDF on save."))
     auto_upload_google_drive_on_save = models.BooleanField(  # pylint: disable=invalid-name
@@ -154,7 +153,15 @@ class Invoice(UuidModel, TimeStampedModel):
         Aggregate this invoice's line items so quantities and total costs of items with the same keys are summed.
 
         :param fields: Which fields should be returned for each aggregated line item.
-        :return: A `QuerySet` of `dict`s representing each aggregated line item.
+        :return: A `QuerySet` of `dict`s representing each aggregated line item. For example:
+        >>> QuerySet([{
+        >>>     'key': 'OC-1',
+        >>>     'name': 'Hard Task',
+        >>>     'price': models.DecimalField('500.00000000'),
+        >>>     'quantity': models.DecimalField('1.00000000'),
+        >>>     'total': models.DecimalField('500.00000000')},
+        >>>     ...
+        >>> ])
         """
         if fields is None:
             fields = ('key', 'name', 'price', 'quantity', 'total',)
@@ -190,7 +197,8 @@ class Invoice(UuidModel, TimeStampedModel):
         jira_worklogs = jira.tempo_worklogs(self.provider.user.username, self.billing_start_date, self.billing_end_date)
         jira_worklog_set = {
             (worklog.worklog_id, worklog.issue_key, worklog.issue_title, worklog.description, worklog.time_spent,)
-            for worklog in jira_worklogs}
+            for worklog in jira_worklogs
+        }
         line_item_set = set(self.line_items
                             .filter(tags__name__in=[LineItem.JIRA_TAG])
                             .values_list('line_item_id', 'key', 'name', 'description', 'quantity',))
@@ -206,7 +214,7 @@ class Invoice(UuidModel, TimeStampedModel):
                 models.Q(key__in=[worklog[1] for worklog in deleted_jira_worklogs])
             ).delete()
 
-        # Perform any additions.
+        # Perform any additions and tag them as JIRA worklogs.
         # This performs a creation even for those worklogs that had previously existed but are now changed in
         # some field like name, description, or quantity. But that's okay, because they were 'refreshed' by
         # being deleted first.
@@ -238,11 +246,7 @@ class Invoice(UuidModel, TimeStampedModel):
 
         # Get only the bank account details that exist for the provider.
         provider_bank_account = self.provider.bank_accounts.first()
-        provider_bank_account_details = tuple(
-            (name, provider_bank_account.identification[key])
-            for key, name in BankAccountIdentifiers.choices
-            if provider_bank_account.identification[key]
-        )
+        provider_bank_account_details = provider_bank_account.existing_identification()
 
         template = get_template('{template}/{template}.html'.format(template=self.template))
         invoice = template.render({
@@ -296,22 +300,29 @@ class Invoice(UuidModel, TimeStampedModel):
 
         # Generate a query we'll use repeatedly for finding the proper folder.
         query = ("mimeType ='application/vnd.google-apps.folder' and "
-                 "'{}' in parents and "
+                 "'{parent}' in parents and "
                  "trashed=false")
 
-        def get_folder_id(root, name):
-            """ Returns the ID of the folder with name `name` in the folder given by ID `root`. """
-            folders = drive.ListFile({'q': query.format(root)}).GetList()
-            for folder in folders:
-                if folder['title'] == name:
-                    return folder['id']
+        def get_folder_id(root, path=None):
+            """
+            Return the ID of the folder with the last name in `path`, starting traversal from folder given by ID `root`.
+            """
+            if path and isinstance(path, list):
+                folders = drive.ListFile({'q': query.format(parent=root)}).GetList()
+                for folder in folders:
+                    if folder['title'] == path[0]:
+                        root = folder['id']
+                        break
+                return get_folder_id(root, path[1:])
+            return root
 
         gauth = GoogleAuth()
         gauth.ServiceAuth()
         drive = GoogleDrive(gauth)
-        year_folder = get_folder_id(settings.GOOGLE_DRIVE_ROOT, str(self.billing_start_date.year))
-        invoice_folder = get_folder_id(year_folder, 'invoices-in')
-        month_folder = get_folder_id(invoice_folder, str(self.billing_start_date.month))
+        month_folder = get_folder_id(
+            settings.GOOGLE_DRIVE_ROOT,
+            path=[str(self.billing_start_date.year), 'invoices-in', str(self.billing_start_date.month)]
+        )
         file = drive.CreateFile({
             'title': invoice_file.split('/')[-1],
             'parents': [{'id': month_folder}]
@@ -326,7 +337,7 @@ class Invoice(UuidModel, TimeStampedModel):
         super().save(**kwargs)
         if self.auto_download_jira_worklogs_on_save:
             self.fill_line_items_from_jira()
-        if self.auto_pdf_on_save:
+        if self.auto_create_pdf_on_save:
             pdf = self.to_pdf()
             if self.auto_upload_google_drive_on_save:
                 self.upload_to_google_drive(pdf)
@@ -343,18 +354,15 @@ class LineItem(models.Model):
         Invoice, on_delete=models.CASCADE, related_name='line_items',
         help_text=_("The invoice to which this line item belongs."))
     line_item_id = models.IntegerField(
-        help_text=_("A non-auto-incrementing ID used for line items with the same fields for when the "
-                    "items may be the same or different. "
-                    "For example: a line item may have the exact same descriptive fields but still be "
-                    "a separate physical item, in which case a UUID or auto-incrementing ID would not suffice "
-                    "to tell the difference."))
+        help_text=_("An ID for this line item, unique with the line item key. "
+                    "Can be used to store incoming ID data from 3rd parties."))
     key = models.CharField(
         max_length=100,
         help_text=_("The key identifier for this line item. "
                     "For example: OC-9999."))
     name = models.CharField(
         max_length=255,
-        help_text=_("What the item is."))
+        help_text=_("What the item is, i.e. a formal title or summary of the item."))
     description = models.TextField(
         blank=True, null=True,
         help_text=_("What this line item is about. "

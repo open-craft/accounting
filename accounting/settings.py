@@ -70,7 +70,6 @@ INSTALLED_APPS = (
     'huey.contrib.djhuey',
     'rest_framework',
     'rest_framework.authtoken',
-    'rosetta',
     'simple_email_confirmation',
     'simple_history',
     'taggit',

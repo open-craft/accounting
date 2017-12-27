@@ -26,7 +26,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" type="text/css" href="{% static 'vendor/css/bootstrap.min.css' %}"/>
-    <link rel="stylesheet" type="text/css" href="{% static 'default/css/default.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'without_bank_account/css/without_bank_account.css' %}"/>
   </head>
   <body>
     <div class="container">
@@ -69,23 +69,14 @@
               </div>
             {% endfor %}
           </div>
-          <div class="row">
-            <div id="client-bank-account-details" class="col-xs-6">
-              <h5 class="client-bank-account-header"><strong>BANK ACCOUNT</strong></h5>
-              Bank Name: {{ bank_account.bank.name }}<br>
-              Bank Account Type: {{ bank_account.type|title }}<br>
-              Bank Account Currency: {{ bank_account.currency }}<br>
-              {% for name, value in bank_account_details %}
-                {{ name }}: {{ value }}<br>
-              {% endfor %}
+          {% if invoice.extra_text %}
+            <div class="row">
+              <div id="extra" class="col-xs-12">
+                <h5 class="extra-header"><strong>EXTRA</strong></h5>
+                <p id="extra-text">{{ invoice.extra_text|linebreaks }}</p>
+              </div>
             </div>
-            {% if invoice.extra_text %}
-            <div id="extra" class="col-xs-6">
-              <h5 class="extra-header"><strong>EXTRA</strong></h5>
-              <p id="extra-text">{{ invoice.extra_text|linebreaks }}</p>
-            </div>
-            {% endif %}
-          </div>
+          {% endif %}
         </header>
 
         <main>

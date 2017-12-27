@@ -33,5 +33,8 @@ class InvoiceTemplate(DjangoChoices):
 
     For example, if adding a new invoice template 'stylish', name the files 'stylish.html' and 'stylish.css'
     in directory 'stylish'.
+
+    By default, the `default/default.html` template is used, with styles `default/css/default.css`.
     """
     Default = ChoiceItem('default', _('Default'))
+    WithoutBankAccount = ChoiceItem('without_bank_account', _('Without Bank Account'))

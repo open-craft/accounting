@@ -10,7 +10,6 @@ django-extensions==1.9.8
 django-filter==1.1.0
 django-money==0.12.1
 django-redis==4.8.0
-django-rosetta==0.7.14
 django-simple-email-confirmation==0.22
 django-simple-history==1.9.0
 django-taggit==0.22.1

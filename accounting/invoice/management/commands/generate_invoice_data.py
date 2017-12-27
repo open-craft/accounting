@@ -30,7 +30,7 @@ LOGGER = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     """
-    A management command to generate data for the Account application.
+    A management command to generate data for the Invoice application.
     """
 
     help = 'Generate data for the Invoice app, usually to play with in a development environment.'

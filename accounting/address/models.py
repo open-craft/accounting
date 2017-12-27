@@ -37,7 +37,7 @@ class Address(UuidModel):
         help_text=_("The country associated with this user account."))
     address_line1 = models.CharField(
         max_length=128,
-        help_text=_("The first address line used to appear on accounting documents, i.e. invoices."))
+        help_text=_("The first address line to appear on accounting documents, i.e. invoices."))
     address_line2 = models.CharField(
         max_length=128, blank=True, null=True,
         help_text=_("Additional line for extending an address."))

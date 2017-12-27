@@ -101,3 +101,13 @@ class BankAccount(UuidModel):
             currency=self.currency,
             type=self.type,
         )
+
+    def existing_identification(self):
+        """
+        Get only the bank account identification details that exist.
+        """
+        return tuple(
+            (name, self.identification[key])
+            for key, name in BankAccountIdentifiers.choices
+            if self.identification[key]
+        )

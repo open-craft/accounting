@@ -24,7 +24,7 @@ A sample development environment settings file is in `.environ/.env.dev`. You ca
 
 Invoices can be loaded with line items derived from JIRA Tempo worklogs, given that the username of the provider on the invoice is equal to a username on a JIRA instance.
 
-Syncrhonization is guaranteed -- any line item that's tagged as a JIRA worklog will be checked against incoming JIRA worklogs, and a mismatch leads to deletion, whereas ones that don't exist yet always get added, thus ensuring a complete match for all relevant fields -- issue title, worklog description, worklog quantity, and so on.
+Synchronization is guaranteed -- any line item that's tagged as a JIRA worklog will be checked against incoming JIRA worklogs, and a mismatch leads to deletion, whereas ones that don't exist yet always get added, thus ensuring a complete match for all relevant fields -- issue title, worklog description, worklog quantity, and so on.
 
 You will also need a JIRA user that serves as a sort of 'service user', but it doesn't have to be -- any user that can access any other user's worklogs through the API is good to be used.
 
@@ -56,7 +56,7 @@ For example:
 
 This would mean that the integration uploaded `invoice.pdf` to folder `09`, inside folder `invoices-in`, which was inside folder `2017`. This also thus corresponds to the invoice's billing start date being `2017-09-X` where `X` is any day in September.
 
-For your development environment to use Google Drive integration, you'll have to setup a service account on Google Console. This service account can then be associated with PKCS12 credentials, which you can download.
+For your development environment to use Google Drive integration, you'll have to set up a service account on Google Console. This service account can then be associated with PKCS12 credentials, which you can download.
 
 The PKCS12 credentials can be stored as `.p12` in the root of this repository, or anything that matches the `GOOGLE_AUTH_PKCS12_FILE_PATH` setting.
 

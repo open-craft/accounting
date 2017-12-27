@@ -36,6 +36,9 @@ LOGGER = logging.getLogger(__name__)
 class Command(BaseCommand):
     """
     A management command to generate data for the Account application.
+
+    Specifically, generate `HourlyRate` objects between generated `Account` objects.
+    Also optionally create `BankAccount` objects.
     """
 
     help = 'Generate data for the Account app, usually to play with in a development environment.'
@@ -44,7 +47,7 @@ class Command(BaseCommand):
     DEFAULT_PASSWORD = 'password'  # NOQA
     DEFAULT_IS_STAFF = False
     DEFAULT_IS_SUPERUSER = False
-    DEFAULT_BANK_ACCOUNTS = True
+    DEFAULT_CREATE_BANK_ACCOUNTS = True
 
     def add_arguments(self, parser):
         """
@@ -57,7 +60,8 @@ class Command(BaseCommand):
             type=int,
             default=self.DEFAULT_ACCOUNTS_NUM,
             help='The number of accounts to generate, including address and hourly rate data. Use an even number, '
-                 'since we use the HourlyRate model to generate accounts, which generates 2 accounts per instance. '
+                 'since we use the HourlyRate factory to generate accounts, which needs 2 accounts '
+                 '(provider and client) per instance. '
                  'By default, generates 10 accounts.'
         )
         parser.add_argument(
@@ -91,7 +95,7 @@ class Command(BaseCommand):
             action='store',
             dest='bank_accounts',
             type=bool,
-            default=self.DEFAULT_BANK_ACCOUNTS,
+            default=self.DEFAULT_CREATE_BANK_ACCOUNTS,
             help='Whether or not to generate bank accounts as well as user accounts. '
                  'By default, does generate bank accounts in addition to user accounts.'
         )

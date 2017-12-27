@@ -18,7 +18,7 @@
 #
 
 """
-Administraion for Invoices.
+Administration for Invoices.
 """
 
 from django.contrib import admin

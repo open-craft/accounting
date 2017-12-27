@@ -1,0 +1,105 @@
+/**
+ * OpenCraft -- tools to aid developing and hosting free software projects
+ * Copyright (C) 2017-2018 OpenCraft <contact@opencraft.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+/*
+ * It is generally OK in these single template-specific styles to use IDs as selectors.
+ * Don't do this if you're going to re-use the style across different invoice templates, though.
+*/
+
+.container {
+  width: 100%;
+  margin: auto;
+  padding: 30px;
+  border: 1px solid #eee;
+  box-shadow: 0 0 10px rgba(0, 0, 0, .15);
+  font-size: 16px;
+  line-height: 24px;
+  font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+  color: #555;
+}
+
+.row ~ .row,
+header ~ main {
+  margin-top: 10px;
+}
+
+#invoice-metadata,
+#client-details {
+  text-align: right;
+}
+
+header > hr {
+  border: none;
+  height: 1px;
+  color: #333;
+  background-color: #333;
+}
+
+.col-xs-6 ~ .col-xs-6 {
+  text-align: right;
+}
+
+.column {
+  text-align: center;
+}
+
+.column-key {
+  width: 15%;
+}
+
+.column-price {
+  width: 15%;
+}
+
+.column-total {
+  width: 18%;
+  text-align: right;
+}
+
+.column-name {
+  text-align: left;
+}
+
+.invoice table td {
+  padding: 5px;
+}
+
+.title {
+  font-size: 45px;
+  line-height: 45px;
+  color: #333;
+}
+
+.invoice table tr.item {
+  border-bottom: 1px solid #eee;
+}
+
+.invoice tr.total {
+  border-top: 3px solid #eee;
+  font-weight: bold;
+}
+
+#total-text {
+  text-align: left;
+}
+
+#signature-img {
+  max-height: 80px;
+  max-width: 100%;
+}
