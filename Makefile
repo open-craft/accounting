@@ -48,7 +48,7 @@ clean: ## Remove all temporary files.
 	find -name '__pycache__' -type d -delete
 	rm -rf .coverage build
 
-install_system_dependencies: apt_get_update ## Install system-level dependencies from `debian_packages.lst`.
+install_system_dependencies: ## Install system-level dependencies from `debian_packages.lst`.
 	sudo -E apt-get install -y `tr -d '\r' < debian_packages.lst`
 
 .PHONY: static
