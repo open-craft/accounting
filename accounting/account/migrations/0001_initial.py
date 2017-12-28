@@ -3,10 +3,11 @@
 from __future__ import unicode_literals
 
 from decimal import Decimal
+import uuid
+
 from django.db import migrations, models
 import django.db.models.deletion
 import djmoney.models.fields
-import uuid
 import vies.models
 
 
