@@ -24,6 +24,7 @@ Invoice models.
 from datetime import timedelta
 import logging
 import os
+import uuid
 
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -263,7 +264,9 @@ class Invoice(UuidModel, TimeStampedModel):
             'total_cost': aggregated_cost['total_cost'],
             'currency': self.hourly_rate.hourly_rate_currency
         })
-        pdf_name = 'invoice_{provider}_{client}_{date}.pdf'.format(
+        pdf_name = '{uuid1}-{uuid2}|invoice_{provider}_{client}_{date}.pdf'.format(
+            uuid1=self.uuid,
+            uuid2=uuid.uuid4(),
             date=self.date.strftime("%Y-%m-%d"),
             provider=self.provider.user.username,
             client=self.client.user.username,
@@ -324,7 +327,7 @@ class Invoice(UuidModel, TimeStampedModel):
             path=[str(self.billing_start_date.year), 'invoices-in', str(self.billing_start_date.month)]
         )
         file = drive.CreateFile({
-            'title': invoice_file.split('/')[-1],
+            'title': invoice_file.split('/')[-1].split('|')[-1],  # TODO: Make this cleaner.
             'parents': [{'id': month_folder}]
         })
         file.SetContentFile(invoice_file)
