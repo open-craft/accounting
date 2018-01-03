@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-24 22:21+0000\n"
+"POT-Creation-Date: 2018-01-03 16:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -85,7 +85,7 @@ msgstr ""
 
 #: accounting/address/models.py:40
 msgid ""
-"The first address line used to appear on accounting documents, i.e. invoices."
+"The first address line to appear on accounting documents, i.e. invoices."
 msgstr ""
 
 #: accounting/address/models.py:43
@@ -273,66 +273,73 @@ msgstr ""
 msgid "Bank Accounts"
 msgstr ""
 
-#: accounting/common/models.py:36
+#: accounting/common/models.py:48
 msgid "UUID"
 msgstr ""
 
-#: accounting/common/models.py:37
+#: accounting/common/models.py:49
 msgid "The universally unique identifier for this model instance."
 msgstr ""
 
-#: accounting/invoice/choices.py:37
+#: accounting/invoice/choices.py:39
 msgid "Default"
 msgstr ""
 
-#: accounting/invoice/models.py:79
+#: accounting/invoice/choices.py:40
+msgid "Without Bank Account"
+msgstr ""
+
+#: accounting/invoice/models.py:78
 msgid ""
 "The unique invoice number. Defaults to yyyy-mm for the current year and "
 "month."
 msgstr ""
 
-#: accounting/invoice/models.py:83
+#: accounting/invoice/models.py:82
 msgid ""
 "The date this invoice was created and sent for billing purposes. Defaults to "
 "right now, but can be changed."
 msgstr ""
 
-#: accounting/invoice/models.py:87
+#: accounting/invoice/models.py:86
 msgid ""
 "The first date for which the line items in this invoice were provided. "
 "Defaults to the first day of the past month."
 msgstr ""
 
-#: accounting/invoice/models.py:91
+#: accounting/invoice/models.py:90
 msgid ""
 "The last date for which the line items in this invoice were provided. "
 "Defaults to the last day of the past month."
 msgstr ""
 
-#: accounting/invoice/models.py:95
+#: accounting/invoice/models.py:94
 msgid "When this invoice should be paid."
 msgstr ""
 
-#: accounting/invoice/models.py:98
+#: accounting/invoice/models.py:97
 msgid "The invoicing service/product provider."
 msgstr ""
 
-#: accounting/invoice/models.py:101
+#: accounting/invoice/models.py:100
 msgid "The client being invoiced for services/products."
 msgstr ""
 
-#: accounting/invoice/models.py:104
+#: accounting/invoice/models.py:103
 msgid "Whether this invoice has been paid by the client yet or not."
 msgstr ""
 
-#: accounting/invoice/models.py:107
+#: accounting/invoice/models.py:106
 msgid ""
 "Any arbitrary extra text that the provider would like to display on their "
-"invoice. Each template has a designated location to place this extra text."
+"invoice. Each template should have a designated location to place this extra "
+"text."
 msgstr ""
 
-#: accounting/invoice/models.py:111
-msgid "The provider's signature."
+#: accounting/invoice/models.py:110
+msgid ""
+"Any arbitrary extra image that the provider would like to display on their "
+"invoice. For example, this could be the provider's signature."
 msgstr ""
 
 #: accounting/invoice/models.py:114
@@ -363,50 +370,47 @@ msgstr ""
 msgid "Invoices"
 msgstr ""
 
-#: accounting/invoice/models.py:318
+#: accounting/invoice/models.py:358
 msgid "The invoice to which this line item belongs."
 msgstr ""
 
-#: accounting/invoice/models.py:320
+#: accounting/invoice/models.py:360
 msgid ""
-"A non-auto-incrementing ID used for line items with the same fields for when "
-"the items may be the same or different. For example: a line item may have "
-"the exact same descriptive fields but still be a separate physical item, in "
-"which case a UUID or auto-incrementing ID would not suffice to tell the "
-"difference."
+"An ID for this line item, unique with the line item key. Can be used to "
+"store incoming ID data from 3rd parties."
 msgstr ""
 
-#: accounting/invoice/models.py:327
+#: accounting/invoice/models.py:364
 msgid "The key identifier for this line item. For example: OC-9999."
 msgstr ""
 
-#: accounting/invoice/models.py:331
-msgid "What the item is."
+#: accounting/invoice/models.py:368
+msgid "What the item is, i.e. a formal title or summary of the item."
 msgstr ""
 
-#: accounting/invoice/models.py:334
+#: accounting/invoice/models.py:371
 msgid ""
 "What this line item is about. Optional: this will only display on invoices "
 "that have the description column."
 msgstr ""
 
-#: accounting/invoice/models.py:338
+#: accounting/invoice/models.py:375
 msgid "How many of these items should be billed."
 msgstr ""
 
-#: accounting/invoice/models.py:341
+#: accounting/invoice/models.py:378
 msgid "How much each unit of this line item costs, including the currency."
 msgstr ""
 
-#: accounting/invoice/models.py:344
+#: accounting/invoice/models.py:381
 msgid ""
 "A special tag for this line item. Can be used to group line items by tag."
 msgstr ""
 
-#: accounting/invoice/models.py:347
+#: accounting/invoice/models.py:384
 msgid "Line Item"
 msgstr ""
 
-#: accounting/invoice/models.py:348
+#: accounting/invoice/models.py:385
 msgid "Line Items"
 msgstr ""
