@@ -69,7 +69,7 @@ class UserSerializer(UuidModelSerializer):
 
     class Meta(UuidModelSerializer.Meta):
         model = USER_MODEL
-        fields = UuidModelSerializer.Meta.fields + ('username', 'email', 'full_name', 'first_name', 'last_name',)
+        fields = UuidModelSerializer.Meta.fields + ('username', 'email', 'full_name',)
 
 
 class CreateUserSerializer(UserSerializer):
