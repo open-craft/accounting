@@ -74,6 +74,14 @@ class TempoWorklog:
         """
         self._worklog = raw_worklog
 
+    def __str__(self):
+        """
+        Show the ID, key, description, and time spent in hours of this worklog.
+        """
+        return '({id}) {key}: {description} - {time_spent}h'.format(
+            id=self.worklog_id, key=self.issue_key, description=self.description, time_spent=self.time_spent,
+        )
+
     @property
     def time_spent_seconds(self):
         """

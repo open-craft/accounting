@@ -34,7 +34,6 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from djmoney.models.fields import MoneyField
 from djmoney.money import Money
-from pydrive.drive import GoogleDrive
 from simple_history.models import HistoricalRecords
 from taggit.managers import TaggableManager
 import pdfkit
@@ -44,6 +43,7 @@ from accounting.common.models import CommonModel, UuidModel
 from accounting.invoice import utils
 from accounting.invoice.choices import InvoiceTemplate
 from accounting.third_party_api.google.auth import GoogleAuth
+from accounting.third_party_api.google.client import GoogleDrive
 from accounting.third_party_api.jira.client import Jira
 
 LOGGER = logging.getLogger(__name__)
@@ -105,9 +105,10 @@ class Invoice(UuidModel):
         blank=True, null=True,
         help_text=_("Any arbitrary extra text that the provider would like to display on their invoice. "
                     "Each template should have a designated location to place this extra text."))
-    signature = models.ImageField(
+    extra_image = models.ImageField(
         blank=True, null=True,
-        help_text=_("The provider's signature."))
+        help_text=_("Any arbitrary extra image that the provider would like to display on their invoice. "
+                    "For example, this could be the provider's signature."))
     template = models.CharField(
         max_length=80, choices=InvoiceTemplate.choices, default=InvoiceTemplate.Default,
         help_text=_("The template to use to generate this invoice."))
@@ -195,6 +196,8 @@ class Invoice(UuidModel):
 
         jira = Jira()
         jira_worklogs = jira.tempo_worklogs(self.provider.user.username, self.billing_start_date, self.billing_end_date)
+        LOGGER.info('Received JIRA worklogs from Tempo: %s', jira_worklogs)
+
         jira_worklog_set = {
             (worklog.worklog_id, worklog.issue_key, worklog.issue_title, worklog.description, worklog.time_spent,)
             for worklog in jira_worklogs
@@ -202,6 +205,8 @@ class Invoice(UuidModel):
         line_item_set = set(self.line_items
                             .filter(tags__name__in=[LineItem.JIRA_TAG])
                             .values_list('line_item_id', 'key', 'name', 'description', 'quantity',))
+        LOGGER.info('JIRA Worklog Set: %s', jira_worklog_set)
+        LOGGER.info('Line Item Set: %s', line_item_set)
 
         # Perform any deletions.
         # Note that even if an existing worklog shares the same ID/Key as an incoming JIRA worklog, if it changed
@@ -209,6 +214,7 @@ class Invoice(UuidModel):
         # added right after. (See below).
         deleted_jira_worklogs = line_item_set - jira_worklog_set
         if deleted_jira_worklogs:
+            LOGGER.info('Deleting the following JIRA worklog line items: %s', deleted_jira_worklogs)
             self.line_items.filter(
                 models.Q(line_item_id__in=[worklog[0] for worklog in deleted_jira_worklogs]) &
                 models.Q(key__in=[worklog[1] for worklog in deleted_jira_worklogs])
@@ -219,17 +225,19 @@ class Invoice(UuidModel):
         # some field like name, description, or quantity. But that's okay, because they were 'refreshed' by
         # being deleted first.
         added_jira_worklogs = jira_worklog_set - line_item_set
-        for worklog in added_jira_worklogs:
-            line_item = self.line_items.create(
-                invoice=self,
-                line_item_id=worklog[0],
-                key=worklog[1],
-                name=worklog[2],
-                description=worklog[3],
-                quantity=worklog[4],
-                price=self.hourly_rate.hourly_rate,
-            )
-            line_item.tags.add(LineItem.JIRA_TAG)
+        if added_jira_worklogs:
+            LOGGER.info('Adding the following JIRA worklogs as line items: %s', added_jira_worklogs)
+            for worklog in added_jira_worklogs:
+                line_item = self.line_items.create(
+                    invoice=self,
+                    line_item_id=worklog[0],
+                    key=worklog[1],
+                    name=worklog[2],
+                    description=worklog[3],
+                    quantity=worklog[4],
+                    price=self.hourly_rate.hourly_rate,
+                )
+                line_item.tags.add(LineItem.JIRA_TAG)
 
     def to_pdf(self):
         """
@@ -275,7 +283,18 @@ class Invoice(UuidModel):
         pdfkit.from_string(invoice, pdf_path, configuration=pdf_configuration, options=self.PDF_OPTIONS)
         return pdf_path
 
-    def upload_to_google_drive(self, invoice_file):  # NOQA
+    @staticmethod
+    def google_drive_file_name(invoice_file_path):
+        """
+        Return file name under which to store invoice that `invoice_file_path` points to on Google Drive.
+
+        Assume that original file name contains a random prefix
+        (format: '{uuid1}-{uuid2}|', where uuid-1 and uuid-2 are different UUID4s) to split off.
+        """
+        invoice_file_name = os.path.basename(invoice_file_path)
+        return invoice_file_name.split("|")[-1]
+
+    def upload_to_google_drive(self, invoice_file_path):  # NOQA
         """
         Upload the invoice in some file format to Google Drive.
 
@@ -300,36 +319,18 @@ class Invoice(UuidModel):
         if not settings.ENABLE_GOOGLE:
             return
 
-        # Generate a query we'll use repeatedly for finding the proper folder.
-        query = ("mimeType ='application/vnd.google-apps.folder' and "
-                 "'{parent}' in parents and "
-                 "trashed=false")
-
-        def get_folder_id(root, path=None):
-            """
-            Return the ID of the folder with the last name in `path`, starting traversal from folder given by ID `root`.
-            """
-            if path and isinstance(path, list):
-                folders = drive.ListFile({'q': query.format(parent=root)}).GetList()
-                for folder in folders:
-                    if folder['title'] == path[0]:
-                        root = folder['id']
-                        break
-                return get_folder_id(root, path[1:])
-            return root
-
         gauth = GoogleAuth()
         gauth.ServiceAuth()
         drive = GoogleDrive(gauth)
-        month_folder = get_folder_id(
+        month_folder = drive.get_folder_id(
             settings.GOOGLE_DRIVE_ROOT,
             path=[str(self.billing_start_date.year), 'invoices-in', str(self.billing_start_date.month)]
         )
         file = drive.CreateFile({
-            'title': invoice_file.split('/')[-1].split('|')[-1],  # TODO: Make this cleaner.
+            'title': Invoice.google_drive_file_name(invoice_file_path),
             'parents': [{'id': month_folder}]
         })
-        file.SetContentFile(invoice_file)
+        file.SetContentFile(invoice_file_path)
         file.Upload()
 
     def save(self, **kwargs):
