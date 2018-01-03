@@ -18,35 +18,27 @@
 #
 
 """
-Common models used throughout the Accounting service.
+Common mixins.
 """
 
-from uuid import uuid4
 
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
-from django_extensions.db.models import TimeStampedModel
-
-from accounting.common.mixins import ValidateModelMixin
-
-
-class CommonModel(ValidateModelMixin, TimeStampedModel):
+class ValidateModelMixin(object):
     """
-    A reusable common model.
-    """
-
-    class Meta:
-        abstract = True
-
-
-class UuidModel(CommonModel):
-    """
-    A reusable model to allow storing UUIDs as a column.
+    Make :meth:`save` call :meth:`full_clean`.
+    .. warning:
+        This should be the left-most mixin/super-class of a model.
+    More info:
+    * "Why doesn't django's model.save() call full clean?"
+        http://stackoverflow.com/questions/4441539/
+    * "Model docs imply that ModelForm will call Model.full_clean(),
+        but it won't."
+        https://code.djangoproject.com/ticket/13100
+    https://gist.github.com/glarrain/5448253
     """
 
-    uuid = models.UUIDField(
-        blank=False, null=False, default=uuid4, editable=False, verbose_name=_("UUID"),
-        help_text=_("The universally unique identifier for this model instance."))
-
-    class Meta:
-        abstract = True
+    def save(self, *args, **kwargs):
+        """
+        Call :meth:`full_clean` before saving.
+        """
+        self.full_clean()
+        super(ValidateModelMixin, self).save(*args, **kwargs)

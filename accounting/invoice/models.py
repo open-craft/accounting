@@ -32,7 +32,6 @@ from django.db import models
 from django.template.loader import get_template
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django_extensions.db.models import TimeStampedModel
 from djmoney.models.fields import MoneyField
 from djmoney.money import Money
 from pydrive.drive import GoogleDrive
@@ -41,7 +40,7 @@ from taggit.managers import TaggableManager
 import pdfkit
 
 from accounting.account.models import Account
-from accounting.common.models import UuidModel
+from accounting.common.models import CommonModel, UuidModel
 from accounting.invoice import utils
 from accounting.invoice.choices import InvoiceTemplate
 from accounting.third_party_api.google.auth import GoogleAuth
@@ -58,7 +57,7 @@ def get_day_with_offset(offset=INVOICE_DUE_DATE_DAYS_OFFSET):
     return timezone.now() + timedelta(days=offset)
 
 
-class Invoice(UuidModel, TimeStampedModel):
+class Invoice(UuidModel):
     """
     A model to hold all data related to an invoice.
 
@@ -346,7 +345,7 @@ class Invoice(UuidModel, TimeStampedModel):
                 self.upload_to_google_drive(pdf)
 
 
-class LineItem(models.Model):
+class LineItem(CommonModel):
     """
     A model to hold information related to line items to be billed through an invoice.
     """
