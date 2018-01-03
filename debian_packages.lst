@@ -12,5 +12,4 @@ subversion
 xvfb
 postgresql-client
 postgresql
-wkhtmltopdf
 gettext
