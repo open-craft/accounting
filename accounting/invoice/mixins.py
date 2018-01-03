@@ -20,5 +20,3 @@
 """
 Invoice mixins.
 """
-
-

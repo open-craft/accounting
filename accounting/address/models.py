@@ -75,7 +75,7 @@ class Address(UuidModel):
             )
         )
 
-    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
+    def save(self, *args, **kwargs):
         """
         Strip address lines of newlines.
         """

@@ -333,7 +333,7 @@ class Invoice(UuidModel):
         file.SetContentFile(invoice_file_path)
         file.Upload()
 
-    def save(self, **kwargs):
+    def save(self, *args, **kwargs):
         """
         Convert the invoice to a PDF and/or upload it to Google Drive after a successful save.
         """
