@@ -22,7 +22,7 @@ services:
     build: .
     # Although `runserver_plus` auto-detects changes, we do a while loop to properly control startup order issues.
     # See https://docs.docker.com/compose/startup-order/ for details, and on why `depends_on` is not enough.
-    command: bash -c 'while true; do python3 manage.py runserver_plus 0.0.0.0:1786; sleep 5; done'
+    command: bash -c 'while true; do python3 manage.py runserver_plus; sleep 5; done'
     environment:
       PYTHONUNBUFFERED: 1
       DATABASE_URL: postgresql://postgres:password@postgres:5432/postgres
