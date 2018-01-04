@@ -42,7 +42,7 @@ To use this feature, you'll need [wkhtmltopdf](https://wkhtmltopdf.org/downloads
 
 Integration with Google Drive currently depends upon being able to generate invoice PDFs. Once a PDF is generated, the Google Drive Integration can take the resulting file and upload it to some very specific location.
 
-The path expected is as such, given that `year` and `month` are the invoice's billing start date year and month in numerical form, respectively:
+The path expected is as such, given that `year` and `month` are the invoice's creation date year and month in numerical form, respectively:
 
 ```text
 year -> invoices-in -> month -> invoice.pdf
@@ -54,7 +54,7 @@ For example:
 2017 -> invoices-in -> 09 -> invoice.pdf
 ```
 
-This would mean that the integration uploaded `invoice.pdf` to folder `09`, inside folder `invoices-in`, which was inside folder `2017`. This also thus corresponds to the invoice's billing start date being `2017-09-X` where `X` is any day in September.
+This would mean that the integration uploaded `invoice.pdf` to folder `09`, inside folder `invoices-in`, which was inside folder `2017`. This also thus corresponds to the invoice's date being `2017-09-X` where `X` is any day in September.
 
 For your development environment to use Google Drive integration, you'll have to set up a service account on Google Console. This service account can then be associated with PKCS12 credentials, which you can download.
 
@@ -65,6 +65,10 @@ You need to let the integration know the service account's email through `GOOGLE
 Service accounts also need to be given permission to your (presumably private) Google Drive folder. Given the file path examples above, set `GOOGLE_DRIVE_ROOT` to the ID of the folder that *contains* the year folder, i.e. the one that contains `2017`. The ID for this folder is in the URL when you're actually looking at the folder in your browser.
 
 Make sure to set `ENABLE_GOOGLE=true`!
+
+### Reference
+
+See `.environ/.env.dev` for more details on each setting that could use a custom assignment.
 
 ### Setting up Docker
 

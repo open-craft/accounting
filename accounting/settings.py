@@ -19,6 +19,9 @@
 
 """
 Django settings for the Accounting Automation project.
+
+See `.environ/.env.dev` for details on certain settings needed for a development environment,
+and for the most part a production environment.
 """
 
 from urllib.parse import urlparse
