@@ -21,10 +21,9 @@
 Bank application models.
 """
 
+from django.contrib.postgres.fields.jsonb import JSONField
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django_extensions.db.fields.json import JSONField
-from djmoney.models.fields import CurrencyField
 
 from accounting.account.models import Account, Address
 from accounting.bank.choices import BankAccountIdentifiers, BankAccountType
@@ -78,14 +77,16 @@ class BankAccount(UuidModel):
         Account, models.CASCADE, related_name='bank_accounts',
         help_text=_("The user account that this bank account is linked to. "
                     "A user can have multiple bank accounts associated with their user account."))
-    currency = CurrencyField(
-        help_text=_("The currency expected to be held in this bank account."))
     type = models.CharField(
         max_length=30, choices=BankAccountType.choices,
         help_text=_("Whether this is a checking or savings account."))
+    transferwise_recipient_id = models.IntegerField(
+        blank=True, null=True,
+        help_text=_("The TransferWise recipient ID used to identify recipient accounts which contain "
+                    "bank account information."))
     identification = JSONField(
         blank=True, default=IDENTIFICATION_SCHEMA,
-        help_text=_("The unique combination of identification information for this bank account."))
+        help_text=_("Unique identification information for this bank account."))
 
     class Meta:
         verbose_name = _('Bank Account')
@@ -95,10 +96,9 @@ class BankAccount(UuidModel):
         """
         Indicate who this bank account belongs to and in which bank it is.
         """
-        return '{username}: {bank_name} ({currency}, {type})'.format(
+        return '{username}: {bank_name} ({type})'.format(
             username=self.user_account,
             bank_name=self.bank.name,
-            currency=self.currency,
             type=self.type,
         )
 

@@ -36,4 +36,4 @@ class BankAdmin(UuidModelAdmin):
 @admin.register(models.BankAccount)
 class BankAccountAdmin(UuidModelAdmin):
     """ Admin configuration for the `BankAccount` model. """
-    list_display = UuidModelAdmin.list_display + ('bank', 'user_account', 'currency', 'type',)
+    list_display = UuidModelAdmin.list_display + ('bank', 'user_account', 'type',)

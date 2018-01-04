@@ -24,7 +24,6 @@ Factories for testing the Bank application.
 from uuid import uuid4
 
 from factory import fuzzy
-from moneyed import CURRENCIES
 import factory  # pylint: disable=ungrouped-imports
 
 from accounting.account.tests.factories import AccountFactory
@@ -50,7 +49,6 @@ class BankAccountFactory(factory.DjangoModelFactory):
     uuid = factory.LazyFunction(uuid4)
     bank = factory.SubFactory(BankFactory)
     user_account = factory.SubFactory(AccountFactory)
-    currency = fuzzy.FuzzyChoice(CURRENCIES)
     type = fuzzy.FuzzyChoice([BankAccountType.CHECKING, BankAccountType.SAVINGS])
 
     class Meta:

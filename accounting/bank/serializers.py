@@ -50,4 +50,6 @@ class BankAccountSerializer(UuidModelSerializer):
 
     class Meta(UuidModelSerializer.Meta):
         model = models.BankAccount
-        fields = UuidModelSerializer.Meta.fields + ('bank', 'currency', 'type', 'identification',)
+        fields = UuidModelSerializer.Meta.fields + (
+            'bank', 'type', 'identification', 'transferwise_recipient_id',
+        )
