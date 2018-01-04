@@ -32,7 +32,6 @@ from django.db import models
 from django.template.loader import get_template
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django_extensions.db.models import TimeStampedModel
 from djmoney.models.fields import MoneyField
 from djmoney.money import Money
 from simple_history.models import HistoricalRecords
