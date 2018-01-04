@@ -1,0 +1,60 @@
+#!/bin/bash 
+set -e
+
+# Fixes UTF-8 warning ("Your terminal is not configured to receive UTF-8 encoded text.") on some machines.
+export PYTHONIOENCODING="utf-8"
+grep -Fq 'export PYTHONIOENCODING' ~/.bashrc ||
+echo 'export PYTHONIOENCODING="utf-8"' >> ~/.bashrc
+
+# cd to ~/accounting on login
+if [[ $USER == 'ubuntu' ]]; then
+    mkdir -p ~/accounting
+    cd ~/accounting
+    grep -Fq 'cd ~/accounting' ~/.bashrc || echo 'cd ~/accounting' >> ~/.bashrc
+fi
+
+# Need python-3.6 repository
+echo "Setting up python3.6 repository"
+sudo add-apt-repository 'ppa:deadsnakes/ppa'
+sudo apt-get -y update
+
+# Install all dependencies.
+cd ~/accounting
+echo "Installing dependencies."
+sudo -E apt-get install -y `grep -v '^#' debian_packages.lst | tr -d '\r'`
+
+# Activate VirtualEnv
+cd ~/
+mkdir -p ~/.virtualenvs
+python3.6 -m venv ~/.virtualenvs/accounting
+source ~/.virtualenvs/accounting/bin/activate
+
+# Activate virtualenv on login
+if [[ $USER == 'ubuntu' ]]; then
+    grep -Fq 'source ~/.virtualenvs/accounting/bin/activate' ~/.bashrc ||
+    echo 'source ~/.virtualenvs/accounting/bin/activate' >> ~/.bashrc
+fi
+
+# Create postgres user
+sudo -u postgres createuser -d $USER ||
+  echo "Could not create postgres user '$USER' - it probably already exists"
+
+# Allow access to postgres from localhost without password
+cat << EOF | sudo tee /etc/postgresql/9.5/main/pg_hba.conf
+local   all             postgres                                trust 
+local   all             all                                     trust
+host    all             all             127.0.0.1/32            trust
+host    all             all             ::1/128                 trust
+host    all             all             0.0.0.0/0               password 
+EOF
+sudo service postgresql restart
+
+# Need to upgrade pip 
+pip install --upgrade setuptools
+
+# Setup Python Requirements
+cd ~/accounting
+pip install -r requirements.txt
+
+# Initial Migration
+make migrate

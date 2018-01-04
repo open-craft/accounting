@@ -113,3 +113,6 @@ wkhtmltopdf
 # File uploads
 media/*
 !media/.gitkeep
+
+# Vagrant related.
+.vagrant
