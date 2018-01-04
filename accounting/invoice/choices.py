@@ -37,4 +37,3 @@ class InvoiceTemplate(DjangoChoices):
     By default, the `default/default.html` template is used, with styles `default/css/default.css`.
     """
     Default = ChoiceItem('default', _('Default'))
-    WithoutBankAccount = ChoiceItem('without_bank_account', _('Without Bank Account'))
