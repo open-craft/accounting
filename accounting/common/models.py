@@ -39,7 +39,7 @@ class CommonModel(ValidateModelMixin, TimeStampedModel):
         abstract = True
 
 
-class UuidModel(CommonModel):
+class UuidModel(models.Model):
     """
     A reusable model to allow storing UUIDs as a column.
     """

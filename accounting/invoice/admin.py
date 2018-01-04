@@ -33,6 +33,7 @@ class InvoiceAdmin(UuidModelAdmin, SimpleHistoryAdmin):
     """ Admin configuration for the `Invoice` model. """
     list_display = ('number', 'provider', 'client', 'due_date', 'paid',)
     search_fields = ('provider__user__username', 'client__user__username',)
+    readonly_fields = ('pdf_path',)
 
 
 @admin.register(models.LineItem)

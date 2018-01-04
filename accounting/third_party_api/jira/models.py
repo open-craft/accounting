@@ -82,6 +82,12 @@ class TempoWorklog:
             id=self.worklog_id, key=self.issue_key, description=self.description, time_spent=self.time_spent,
         )
 
+    def __repr__(self):
+        """
+        The representation of this tempo worklog.
+        """
+        return self.__str__()
+
     @property
     def time_spent_seconds(self):
         """

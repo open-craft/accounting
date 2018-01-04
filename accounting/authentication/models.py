@@ -25,10 +25,10 @@ from django.contrib.auth import models
 from django.db.models import CharField
 from django.utils.translation import ugettext_lazy as _
 
-from accounting.common.models import UuidModel
+from accounting.common.models import CommonModel, UuidModel
 
 
-class User(UuidModel, models.AbstractUser):
+class User(CommonModel, UuidModel, models.AbstractUser):
     """
     A `User` model with custom columns, like `uuid` and `full_name`.
     """

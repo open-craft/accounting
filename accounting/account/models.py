@@ -28,12 +28,12 @@ from djmoney.models.fields import MoneyField
 from vies.models import VATINField
 
 from accounting.address.models import Address
-from accounting.common.models import UuidModel
+from accounting.common.models import CommonModel, UuidModel
 
 USER_MODEL = get_user_model()
 
 
-class Account(UuidModel):
+class Account(CommonModel, UuidModel):
     """
     An account contains accounting details for a user, i.e. bank account details.
 
@@ -90,7 +90,7 @@ class Account(UuidModel):
         return self.business_name or self.user.get_full_name() or self.user.username
 
 
-class HourlyRate(UuidModel):
+class HourlyRate(CommonModel, UuidModel):
     """
     An hourly rate model that serves as a way to map a provider's hourly rate per client.
 

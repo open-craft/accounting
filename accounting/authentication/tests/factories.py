@@ -34,6 +34,7 @@ class UserFactory(factory.DjangoModelFactory):
 
     uuid = factory.LazyFunction(uuid4)
     username = factory.Faker('user_name')
+    password = 'password'
     email = factory.Faker('email')
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')

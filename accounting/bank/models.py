@@ -28,10 +28,10 @@ from django.utils.translation import ugettext_lazy as _
 from accounting.account.models import Account, Address
 from accounting.bank.choices import BankAccountIdentifiers, BankAccountType
 from accounting.bank.utils import identification_schema
-from accounting.common.models import UuidModel
+from accounting.common.models import CommonModel, UuidModel
 
 
-class Bank(UuidModel):
+class Bank(CommonModel, UuidModel):
     """
     A bank to represent more details about bank accounts for users.
     """
@@ -54,7 +54,7 @@ class Bank(UuidModel):
         return '{name} - {identifier}'.format(name=self.name, identifier=self.uuid)
 
 
-class BankAccount(UuidModel):
+class BankAccount(CommonModel, UuidModel):
     """
     A bank account stores details to help identify a particular user's bank account anywhere in the world.
 

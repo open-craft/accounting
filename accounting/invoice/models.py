@@ -32,6 +32,7 @@ from django.db import models
 from django.template.loader import get_template
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from django_extensions.db.models import TimeStampedModel
 from djmoney.models.fields import MoneyField
 from djmoney.money import Money
 from simple_history.models import HistoricalRecords
@@ -57,7 +58,7 @@ def get_day_with_offset(offset=INVOICE_DUE_DATE_DAYS_OFFSET):
     return timezone.now() + timedelta(days=offset)
 
 
-class Invoice(UuidModel):
+class Invoice(CommonModel, UuidModel):
     """
     A model to hold all data related to an invoice.
 
@@ -113,7 +114,7 @@ class Invoice(UuidModel):
         max_length=80, choices=InvoiceTemplate.choices, default=InvoiceTemplate.Default,
         help_text=_("The template to use to generate this invoice."))
     pdf_path = models.URLField(
-        blank=True, null=True,
+        blank=True, null=True, max_length=300,
         help_text=_("The absolute URL that can be used to retrieve the invoice PDF."))
     history = HistoricalRecords()
 
@@ -264,10 +265,6 @@ class Invoice(UuidModel):
         aggregated_quantity = aggregated_line_items.aggregate(total_quantity=models.Sum('quantity'))
         aggregated_cost = aggregated_line_items.aggregate(total_cost=models.Sum('total'))
 
-        # Get only the bank account details that exist for the provider.
-        provider_bank_account = self.provider.bank_accounts.first()
-        provider_bank_account_details = provider_bank_account.existing_identification()
-
         template = get_template('{template}/{template}.html'.format(template=self.template))
         invoice = template.render({
             'site': Site.objects.get_current(),
@@ -276,8 +273,6 @@ class Invoice(UuidModel):
                 ('provider', self.provider),
                 ('client', self.client),
             ),
-            'bank_account': provider_bank_account,
-            'bank_account_details': provider_bank_account_details,
             'line_items': aggregated_line_items,
             'total_quantity': aggregated_quantity['total_quantity'],
             'total_cost': aggregated_cost['total_cost'],
@@ -317,7 +312,7 @@ class Invoice(UuidModel):
         drive = GoogleDrive(gauth)
         month_folder = drive.get_folder_id(
             settings.GOOGLE_DRIVE_ROOT,
-            path=[str(self.billing_start_date.year), 'invoices-in', str(self.billing_start_date.month)]
+            path=[self.date.strftime('%Y'), 'invoices-in', self.date.strftime('%m')]
         )
         file = drive.CreateFile({
             'title': self.pdf_filename,
@@ -325,19 +320,20 @@ class Invoice(UuidModel):
         })
         file.SetContentFile(self.pdf_path)
         file.Upload()
-        self.pdf_path = file['downloadUrl']
+        self.pdf_path = file['webContentLink']
+        Invoice.objects.filter(pk=self.pk).update(pdf_path=self.pdf_path)
 
     def save(self, *args, **kwargs):
         """
         Convert the invoice to a PDF and/or upload it to Google Drive after a successful save.
         """
+        super().save(**kwargs)
         if self.auto_download_jira_worklogs_on_save:
             self.fill_line_items_from_jira()
         if self.auto_create_pdf_on_save:
             self.to_pdf()
         if self.auto_upload_google_drive_on_save:
             self.upload_to_google_drive()
-        super().save(**kwargs)
 
 
 class LineItem(CommonModel):

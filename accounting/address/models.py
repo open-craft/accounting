@@ -25,10 +25,10 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django_countries.fields import CountryField
 
-from accounting.common.models import UuidModel
+from accounting.common.models import CommonModel, UuidModel
 
 
-class Address(UuidModel):
+class Address(CommonModel, UuidModel):
     """
     An address holding generic locational information.
     """
