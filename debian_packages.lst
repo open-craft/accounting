@@ -13,3 +13,4 @@ xvfb
 postgresql-client
 postgresql
 gettext
+wkhtmltopdf
