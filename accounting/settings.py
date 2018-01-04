@@ -240,7 +240,7 @@ ADMINS = env.json('ADMINS', default=set())
 
 # LOGGING #####################################################################
 
-BASE_HANDLERS = env.json('BASE_HANDLERS', default=["accounting"])
+BASE_HANDLERS = env.json('BASE_HANDLERS', default=["accounting", "mail_admins"])
 HANDLERS = BASE_HANDLERS
 LOGGING_ROTATE_MAX_KBYTES = env.json('LOGGING_ROTATE_MAX_KBYTES', default=10 * 1024)
 LOGGING_ROTATE_MAX_FILES = env.json('LOGGING_ROTATE_MAX_FILES', default=60)
@@ -265,6 +265,10 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
         },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+        }
     },
     'loggers': {
         '': {
