@@ -28,7 +28,7 @@ TODO:    It will require a new permission class to check if the token matches th
 
 from django.contrib.auth import get_user_model
 from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView, get_object_or_404
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser
 
 from accounting.account import models, serializers
 from accounting.account.mixins import AccountViewMixin
@@ -61,7 +61,7 @@ class HourlyRateView(RetrieveUpdateAPIView):
 
     queryset = models.HourlyRate.objects.all()
     serializer_class = serializers.HourlyRateSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUser,)
 
     def get_object(self):
         """
@@ -79,4 +79,4 @@ class CreateHourlyRateView(CreateAPIView):
     """
 
     serializer_class = serializers.CreateHourlyRateSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUser,)

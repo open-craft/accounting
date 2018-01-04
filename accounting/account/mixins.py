@@ -21,7 +21,7 @@
 Mixins for the Account application.
 """
 
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser
 
 from accounting.account import models
 
@@ -33,4 +33,4 @@ class AccountViewMixin:
 
     lookup_field = 'user__username'
     queryset = models.Account.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUser,)

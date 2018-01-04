@@ -22,7 +22,7 @@ Views for the Bank application.
 """
 
 from rest_framework.generics import RetrieveUpdateAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser
 
 from accounting.bank import models, serializers
 
@@ -35,7 +35,7 @@ class BankView(RetrieveUpdateAPIView):
     lookup_field = 'uuid'
     queryset = models.Bank.objects.all()
     serializer_class = serializers.BankSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUser,)
 
 
 class BankAccountView(RetrieveUpdateAPIView):
@@ -46,4 +46,4 @@ class BankAccountView(RetrieveUpdateAPIView):
     lookup_field = 'uuid'
     queryset = models.BankAccount.objects.all()
     serializer_class = serializers.BankAccountSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUser,)

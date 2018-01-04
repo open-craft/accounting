@@ -21,7 +21,7 @@
 Mixins for the Address application.
 """
 
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser
 
 from accounting.address import models
 
@@ -33,4 +33,4 @@ class AddressViewMixin:
 
     lookup_field = 'accounts__user__username'
     queryset = models.Address.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUser,)

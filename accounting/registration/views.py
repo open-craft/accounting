@@ -24,6 +24,7 @@ Views for registration.
 from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.generics import CreateAPIView
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from simple_email_confirmation.exceptions import EmailConfirmationExpired
@@ -41,6 +42,7 @@ class RegistrationView(CreateAPIView):
     """
 
     serializer_class = CreateUserSerializer
+    permission_classes = (IsAdminUser,)
 
     def perform_create(self, serializer):
         """
