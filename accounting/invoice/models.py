@@ -112,6 +112,9 @@ class Invoice(UuidModel):
     template = models.CharField(
         max_length=80, choices=InvoiceTemplate.choices, default=InvoiceTemplate.Default,
         help_text=_("The template to use to generate this invoice."))
+    pdf_path = models.URLField(
+        blank=True, null=True,
+        help_text=_("The absolute URL that can be used to retrieve the invoice PDF."))
     history = HistoricalRecords()
 
     # TODO: The following 2 fields are temporary while we don't have a UI besides the Django admin.
@@ -148,6 +151,17 @@ class Invoice(UuidModel):
         Get the `HourlyRate` object between the provider and client of this invoice.
         """
         return self.provider.provider_hourly_rates.get(client=self.client)
+
+    @property
+    def pdf_filename(self):
+        """
+        Return a PDF filename for this invoice.
+        """
+        return 'invoice_{provider}_{client}_{date}.pdf'.format(
+            date=self.date.strftime("%Y-%m-%d"),
+            provider=self.provider.user.username,
+            client=self.client.user.username,
+        )
 
     def aggregate_line_items(self, fields=None):
         """
@@ -243,8 +257,6 @@ class Invoice(UuidModel):
         """
         Turn the invoice into a PDF using its template.
 
-        If successful, returns the filename of the generated PDF.
-
         TODO: This should be a synchronous job on a non-web worker.
         """
         # Get an aggregated set of data to reduce the length of the invoice.
@@ -271,30 +283,11 @@ class Invoice(UuidModel):
             'total_cost': aggregated_cost['total_cost'],
             'currency': self.hourly_rate.hourly_rate_currency
         })
-        pdf_name = '{uuid1}-{uuid2}|invoice_{provider}_{client}_{date}.pdf'.format(
-            uuid1=self.uuid,
-            uuid2=uuid.uuid4(),
-            date=self.date.strftime("%Y-%m-%d"),
-            provider=self.provider.user.username,
-            client=self.client.user.username,
-        )
-        pdf_path = os.path.join(settings.INVOICE_PDF_PATH, pdf_name)
+        self.pdf_path = os.path.join(settings.INVOICE_PDF_PATH, '{}.pdf'.format(uuid.uuid4()))
         pdf_configuration = pdfkit.configuration(wkhtmltopdf=settings.HTML_TO_PDF_BINARY_PATH)
-        pdfkit.from_string(invoice, pdf_path, configuration=pdf_configuration, options=self.PDF_OPTIONS)
-        return pdf_path
+        pdfkit.from_string(invoice, self.pdf_path, configuration=pdf_configuration, options=self.PDF_OPTIONS)
 
-    @staticmethod
-    def google_drive_file_name(invoice_file_path):
-        """
-        Return file name under which to store invoice that `invoice_file_path` points to on Google Drive.
-
-        Assume that original file name contains a random prefix
-        (format: '{uuid1}-{uuid2}|', where uuid-1 and uuid-2 are different UUID4s) to split off.
-        """
-        invoice_file_name = os.path.basename(invoice_file_path)
-        return invoice_file_name.split("|")[-1]
-
-    def upload_to_google_drive(self, invoice_file_path):  # NOQA
+    def upload_to_google_drive(self):  # NOQA
         """
         Upload the invoice in some file format to Google Drive.
 
@@ -327,23 +320,24 @@ class Invoice(UuidModel):
             path=[str(self.billing_start_date.year), 'invoices-in', str(self.billing_start_date.month)]
         )
         file = drive.CreateFile({
-            'title': Invoice.google_drive_file_name(invoice_file_path),
+            'title': self.pdf_filename,
             'parents': [{'id': month_folder}]
         })
-        file.SetContentFile(invoice_file_path)
+        file.SetContentFile(self.pdf_path)
         file.Upload()
+        self.pdf_path = file['downloadUrl']
 
     def save(self, *args, **kwargs):
         """
         Convert the invoice to a PDF and/or upload it to Google Drive after a successful save.
         """
-        super().save(**kwargs)
         if self.auto_download_jira_worklogs_on_save:
             self.fill_line_items_from_jira()
         if self.auto_create_pdf_on_save:
-            pdf = self.to_pdf()
-            if self.auto_upload_google_drive_on_save:
-                self.upload_to_google_drive(pdf)
+            self.to_pdf()
+        if self.auto_upload_google_drive_on_save:
+            self.upload_to_google_drive()
+        super().save(**kwargs)
 
 
 class LineItem(CommonModel):

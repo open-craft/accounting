@@ -27,6 +27,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from accounting.account.models import Account, Address
 from accounting.bank.choices import BankAccountIdentifiers, BankAccountType
+from accounting.bank.utils import identification_schema
 from accounting.common.models import UuidModel
 
 
@@ -68,8 +69,6 @@ class BankAccount(UuidModel):
     The bank account's currency and address, however, always exists, so that is required.
     """
 
-    IDENTIFICATION_SCHEMA = {identifier[0]: '' for identifier in BankAccountIdentifiers.choices}
-
     bank = models.ForeignKey(
         Bank, models.CASCADE, related_name='bank_accounts',
         help_text=_("The bank to which this bank account belongs."))
@@ -85,7 +84,7 @@ class BankAccount(UuidModel):
         help_text=_("The TransferWise recipient ID used to identify recipient accounts which contain "
                     "bank account information."))
     identification = JSONField(
-        blank=True, default=IDENTIFICATION_SCHEMA,
+        blank=True, default=identification_schema,
         help_text=_("Unique identification information for this bank account."))
 
     class Meta:

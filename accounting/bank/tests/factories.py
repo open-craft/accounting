@@ -24,7 +24,7 @@ Factories for testing the Bank application.
 from uuid import uuid4
 
 from factory import fuzzy
-import factory  # pylint: disable=ungrouped-imports
+import factory
 
 from accounting.account.tests.factories import AccountFactory
 from accounting.address.tests.factories import AddressFactory
