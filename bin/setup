@@ -23,6 +23,7 @@ cd ~/opencraft
 echo "Installing dependencies."
 sudo -E apt-get -y autoremove
 sudo -E apt-get install -y `tr -d '\r' < debian_packages.lst`
+for i in `tr -d '\r' < debian_packages.lst`; do sudo apt-get install -y $i; done
 
 # Activate VirtualEnv
 cd ~/
