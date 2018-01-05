@@ -6,6 +6,7 @@ make
 python3.6
 python3.6-dev
 python3-pip
+python3.6-venv
 redis-server
 subversion
 xvfb
@@ -16,4 +17,3 @@ libxml2-dev
 libxslt1-dev
 gettext
 python-virtualenv
-python3.6-venv
