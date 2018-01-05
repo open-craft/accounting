@@ -49,7 +49,8 @@ clean: ## Remove all temporary files.
 	rm -rf .coverage build
 
 install_system_dependencies: ## Install system-level dependencies from `debian_packages.lst`.
-	sudo -E apt-get install -y `tr -d '\r' < debian_packages.lst`
+	#sudo -E apt-get install -y `tr -d '\r' < debian_packages.lst`
+	for i in `tr -d '\r' < debian_packages.lst`; do sudo apt-get install -y $i; done
 
 .PHONY: static
 static: ## Collect static files for production.

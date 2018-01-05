@@ -6,18 +6,29 @@ if [[ $USER == 'vagrant' ]]; then
 fi
 
 # Need python-3.6 repository
+echo "Setting up python3.6 repository"
 sudo add-apt-repository ppa:jonathonf/python-3.6
 sudo apt-get update
 
+sudo apt-get install -y python3.6 python3.6-dev
+
+# Install pip for python3
+echo "Installing pip for python3"
+sudo apt-get install -y python3-pip
+sudo pip3 install --upgrade pip
+sudo pip3 install --upgrade virtualenv
+
 # Install all dependencies.
+cd ~/opencraft
+echo "Installing dependencies."
+sudo -E apt-get -y autoremove
 sudo -E apt-get install -y `tr -d '\r' < debian_packages.lst`
 
 # Activate VirtualEnv
 cd ~/
 mkdir -p ~/.virtualenvs
-virtualenv -p python3 ~/.virtualenvs/opencraft
+virtualenv -p python3.6 ~/.virtualenvs/opencraft
 source ~/.virtualenvs/opencraft/bin/activate
-
 
 # Need wkhtmlox
 if [ ! -f "wkhtmlox-0.12.4_linux-generic-amd64.tar.xz" ]; then
@@ -46,6 +57,9 @@ host    all             all             127.0.0.1/32            trust
 host    all             all             ::1/128                 trust
 EOF
 sudo service postgresql restart
+
+# Need to upgrade pip 
+pip install --upgrade setuptools
 
 # Setup Python Requirements
 cd ~/opencraft
