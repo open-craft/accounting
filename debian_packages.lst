@@ -13,3 +13,6 @@ xvfb
 postgresql-client
 postgresql
 gettext
+libxml2-dev
+libxslt1-dev
+gettext

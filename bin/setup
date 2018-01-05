@@ -1,0 +1,66 @@
+f this is a vagrant VM, cd to ~/opencraft on login
+if [[ $USER == 'vagrant' ]]; then
+    mkdir -p ~/opencraft
+    cd ~/opencraft
+    grep -Fq 'cd ~/opencraft' ~/.bashrc || echo 'cd ~/opencraft' >> ~/.bashrc
+fi
+
+# Need python-3.6 repository
+echo "Setting up python3.6 repository"
+sudo add-apt-repository ppa:jonathonf/python-3.6
+sudo apt-get update
+
+sudo apt-get install -y python3.6 python3.6-dev
+
+# Install pip for python3
+echo "Installing pip for python3"
+sudo apt-get install -y python3-pip
+sudo pip3 install --upgrade pip
+sudo pip3 install --upgrade virtualenv
+
+# Install all dependencies.
+cd ~/opencraft
+echo "Installing dependencies."
+sudo -E apt-get -y autoremove
+for i in `tr -d '\r' < debian_packages.lst`; do sudo apt-get install -y $i; done
+
+# Activate VirtualEnv
+cd ~/
+mkdir -p ~/.virtualenvs
+virtualenv -p python3.6 ~/.virtualenvs/opencraft
+source ~/.virtualenvs/opencraft/bin/activate
+
+# Need wkhtmlox
+if [ ! -f "wkhtmlox-0.12.4_linux-generic-amd64.tar.xz" ]; then
+    echo "wkhtmltox not found. Downloading."
+    wnux-generic-amd64.tar.xzget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz
+fi
+tar -xvf ./wkhtmltox-0.12.4_linux-generic-amd64.tar.xz
+export PATH=$PATH:$HOME/wkhtmltox/bin
+
+
+# If this is a vagrant VM, activate virtualenv on login
+if [[ $USER == 'vagrant' ]]; then
+    grep -Fq 'source ~/.virtualenvs/opencraft/bin/activate' ~/.bashrc ||
+    echo 'source ~/.virtualenvs/opencraft/bin/activate' >> ~/.bashrc
+fi
+
+# Create postgres user
+sudo -u postgres createuser -d $USER ||
+  echo "Could not create postgres user '$USER' - it probably already exists"
+
+# Allow access to postgres from localhost without password
+cat << EOF | sudo tee /etc/postgresql/9.3/main/pg_hba.conf
+local   all             postgres                                peer
+local   all             all                                     trust
+host    all             all             127.0.0.1/32            trust
+host    all             all             ::1/128                 trust
+EOF
+sudo service postgresql restart
+
+# Need to upgrade pip 
+pip install --upgrade setuptools
+
+# Setup Python Requirements
+cd ~/opencraft
+pip install -r requirements.txt
