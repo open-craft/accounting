@@ -3,10 +3,17 @@ git
 libffi-dev
 libpq-dev
 make
+python3.6
 python3.6-dev
 python3-pip
+python3.6-venv
 redis-server
 subversion
 xvfb
 postgresql-client
 postgresql
+gettext
+# Although we don't use the wkhtmltopdf binary resulting from this package, we need it around
+# because it downloads a whole bunch of dependencies that the raw binary installed online
+# requires to function.
+wkhtmltopdf

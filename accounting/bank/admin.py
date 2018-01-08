@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # OpenCraft -- tools to aid developing and hosting free software projects
-# Copyright (C) 2015-2017 OpenCraft <contact@opencraft.com>
+# Copyright (C) 2017-2018 OpenCraft <contact@opencraft.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -23,7 +23,17 @@ Admin for the Bank application.
 
 from django.contrib import admin
 
-from accounting.bank.models import *  # pylint: disable=wildcard-import,unused-wildcard-import
+from accounting.bank import models
+from accounting.common.admin import UuidModelAdmin
 
-for model in (Bank, BankAccount):  # NOQA
-    admin.site.register(model)
+
+@admin.register(models.Bank)
+class BankAdmin(UuidModelAdmin):
+    """ Admin configuration for the `Bank` model. """
+    list_display = UuidModelAdmin.list_display + ('name', 'address',)
+
+
+@admin.register(models.BankAccount)
+class BankAccountAdmin(UuidModelAdmin):
+    """ Admin configuration for the `BankAccount` model. """
+    list_display = UuidModelAdmin.list_display + ('bank', 'user_account', 'type',)

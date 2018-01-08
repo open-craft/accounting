@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # OpenCraft -- tools to aid developing and hosting free software projects
-# Copyright (C) 2015-2017 OpenCraft <contact@opencraft.com>
+# Copyright (C) 2017-2018 OpenCraft <contact@opencraft.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -20,3 +20,21 @@
 """
 Auth admin.
 """
+
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from django.utils.translation import ugettext_lazy as _
+
+from accounting.authentication.models import User
+
+
+@admin.register(User)
+class CustomUserAdmin(UserAdmin):
+    """ Admin configuration for the custom User model. """
+    list_display = ('username', 'email', 'full_name', 'first_name', 'last_name', 'is_staff',)
+    fieldsets = (
+        (None, {'fields': ('username', 'password',)}),
+        (_('Personal info'), {'fields': ('full_name', 'first_name', 'last_name', 'email')}),
+        (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+    )

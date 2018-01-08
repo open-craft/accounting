@@ -24,6 +24,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+/static/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -102,3 +103,13 @@ ENV/
 
 # Private Makefile
 private.mk
+
+# p12 keys
+.p12
+
+# Binary file for HTML-to-PDF conversion
+wkhtmltopdf
+
+# File uploads
+media/*
+!media/.gitkeep

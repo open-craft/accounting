@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # OpenCraft -- tools to aid developing and hosting free software projects
-# Copyright (C) 2015-2017 OpenCraft <contact@opencraft.com>
+# Copyright (C) 2017-2018 OpenCraft <contact@opencraft.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -27,6 +27,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.views import ObtainAuthToken as UpstreamObtainAuthToken
 from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -99,3 +100,4 @@ class UserView(RetrieveUpdateAPIView):
     lookup_field = 'username'
     queryset = USER_MODEL.objects.filter(is_active=True)
     serializer_class = UserSerializer
+    permission_classes = (IsAdminUser,)

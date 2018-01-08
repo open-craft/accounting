@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # OpenCraft -- tools to aid developing and hosting free software projects
-# Copyright (C) 2015-2017 OpenCraft <contact@opencraft.com>
+# Copyright (C) 2017-2018 OpenCraft <contact@opencraft.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -21,42 +21,35 @@
 Bank serializers.
 """
 
-from rest_framework import serializers
+from rest_framework.serializers import JSONField
 
+from accounting.address.serializers import AddressSerializer
 from accounting.bank import models
+from accounting.common.serializers import UuidModelSerializer
 
 
-# TODO: This is repeat code from accounting.account.serializers.AddressSerializer. Move it to a common app later.
-class AddressSerializer(serializers.ModelSerializer):
-    """
-    Address model serializer.
-    """
-
-    class Meta:
-        model = models.Address
-        fields = ('country', 'address_line1', 'address_line2', 'zipcode', 'city', 'state',)
-
-
-class BankSerializer(serializers.ModelSerializer):
+class BankSerializer(UuidModelSerializer):
     """
     Bank model serializer.
     """
 
     address = AddressSerializer(required=False)
 
-    class Meta:
+    class Meta(UuidModelSerializer.Meta):
         model = models.Bank
-        fields = ('uuid', 'name', 'address',)
+        fields = UuidModelSerializer.Meta.fields + ('name', 'address',)
 
 
-class BankAccountSerializer(serializers.ModelSerializer):
+class BankAccountSerializer(UuidModelSerializer):
     """
     Bank Account serializer.
     """
 
     bank = BankSerializer()
+    identification = JSONField()
 
-    class Meta:
+    class Meta(UuidModelSerializer.Meta):
         model = models.BankAccount
-        fields = ('uuid', 'bank', 'currency', 'type', 'iban', 'bic', 'abn', 'bsb', 'vat',
-                  'account_number', 'routing_number',)
+        fields = UuidModelSerializer.Meta.fields + (
+            'bank', 'type', 'identification', 'transferwise_recipient_id',
+        )

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # OpenCraft -- tools to aid developing and hosting free software projects
-# Copyright (C) 2015-2017 OpenCraft <contact@opencraft.com>
+# Copyright (C) 2017-2018 OpenCraft <contact@opencraft.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -21,18 +21,17 @@
 Views for the Account application.
 
 TODO: For increased security, do the following:
-TODO: 1. Make each object's unique identifier a UUID, rather than an ID, for serialization purposes.
-TODO: 2. For views that require the user to be authenticated and change some user information,
+TODO: 1. For views that require the user to be authenticated and change some user information,
 TODO:    make sure the information being changed belongs to that user. This part should be done before deployment!
 TODO:    It will require a new permission class to check if the token matches the user's.
 """
 
 from django.contrib.auth import get_user_model
-from rest_framework.generics import CreateAPIView, RetrieveAPIView, RetrieveUpdateAPIView, get_object_or_404
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView, get_object_or_404
+from rest_framework.permissions import IsAdminUser
 
 from accounting.account import models, serializers
-from accounting.account.mixins import AccountViewMixin, AddressViewMixin
+from accounting.account.mixins import AccountViewMixin
 
 USER_MODEL = get_user_model()
 
@@ -55,14 +54,6 @@ class CreateAccountView(AccountViewMixin, CreateAPIView):
     serializer_class = serializers.CreateAccountSerializer
 
 
-class AddressView(AddressViewMixin, CreateAPIView, RetrieveAPIView):
-    """
-    A view for retrieving and updating `Address` objects.
-    """
-
-    serializer_class = serializers.AddressSerializer
-
-
 class HourlyRateView(RetrieveUpdateAPIView):
     """
     A view for retrieving and updating `HourlyRate` objects between a specific provider and client.
@@ -70,7 +61,7 @@ class HourlyRateView(RetrieveUpdateAPIView):
 
     queryset = models.HourlyRate.objects.all()
     serializer_class = serializers.HourlyRateSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUser,)
 
     def get_object(self):
         """
@@ -88,4 +79,4 @@ class CreateHourlyRateView(CreateAPIView):
     """
 
     serializer_class = serializers.CreateHourlyRateSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAdminUser,)

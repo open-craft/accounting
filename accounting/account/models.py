@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # OpenCraft -- tools to aid developing and hosting free software projects
-# Copyright (C) 2015-2017 OpenCraft <contact@opencraft.com>
+# Copyright (C) 2017-2018 OpenCraft <contact@opencraft.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -24,51 +24,16 @@ Account models used for user accounts in the Accounting service.
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django_countries.fields import CountryField
 from djmoney.models.fields import MoneyField
+from vies.models import VATINField
+
+from accounting.address.models import Address
+from accounting.common.models import CommonModel, UuidModel
 
 USER_MODEL = get_user_model()
 
 
-class Address(models.Model):
-    """
-    An address holding generic locational information.
-    """
-
-    country = CountryField(
-        help_text=_("The country associated with this user account."))
-    address_line1 = models.CharField(
-        max_length=128,
-        help_text=_("The first address line used to appear on accounting documents, i.e. invoices."))
-    address_line2 = models.CharField(
-        max_length=128, blank=True, null=True,
-        help_text=_("Additional line for extending an address."))
-    zipcode = models.CharField(
-        max_length=10,
-        help_text=_("A 5-digit or ZIP+4 zipcode. Example: 12345, 12345-6789."))
-    city = models.CharField(
-        max_length=60,
-        help_text=_("The city associated with this user account."))
-    state = models.CharField(
-        max_length=80, blank=True, null=True,
-        help_text=_("The state or province associated with this user account. "
-                    "Required if country is US, CA, AU, or BR."))
-
-    class Meta:
-        verbose_name = _('Address')
-        verbose_name_plural = _('Addresses')
-
-    def __str__(self):
-        """
-        Return a string identifying this address object.
-        """
-        # TODO: Handle the case where non-required values are missing, like `state` and `address_line2`.
-        return '{} {}, {} {} {}, {}'.format(
-            self.address_line1, self.address_line2, self.city, self.state, self.zipcode, self.country
-        )
-
-
-class Account(models.Model):
+class Account(CommonModel, UuidModel):
     """
     An account contains accounting details for a user, i.e. bank account details.
 
@@ -90,6 +55,10 @@ class Account(models.Model):
         max_length=80, blank=True, null=True,
         help_text=_("The occupation of the user of this account. "
                     "Required if country is US, CA, or JP."))
+    vat = VATINField(
+        blank=True, null=True,
+        help_text=_("The Value Added Tax identification number used in and required by some countries. "
+                    "This can also be used to store a General Sales Tax (GST) identification number."))
 
     # We link hourly rates to other accounts, because an account can exist for both a provider and a client, and
     # because hourly rates can differ for a provider per client, and vice versa. For example:
@@ -111,10 +80,17 @@ class Account(models.Model):
         """
         Returns a string indicating to whom this account belongs.
         """
+        return self.name
+
+    @property
+    def name(self):
+        """
+        Return the appropriate name for this account, depending on what information is available.
+        """
         return self.business_name or self.user.get_full_name() or self.user.username
 
 
-class HourlyRate(models.Model):
+class HourlyRate(CommonModel, UuidModel):
     """
     An hourly rate model that serves as a way to map a provider's hourly rate per client.
 
@@ -148,8 +124,8 @@ class HourlyRate(models.Model):
             - Lowly Dev charges Unicorn Startup 15 EUR / hour
         """
         return '{provider} charges {client}{optional_space}{rate} / hour'.format(
-            provider=str(self.provider),
+            provider=self.provider,
             optional_space=' ' if self.client else '',
-            client=str(self.client) if self.client else '',
+            client=self.client if self.client else '',
             rate=self.hourly_rate,
         )
