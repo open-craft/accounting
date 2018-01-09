@@ -21,6 +21,6 @@
 Third Party APIs URL Configuration.
 """
 
-url_patterns = [
+urlpatterns = [
 
 ]

@@ -18,5 +18,5 @@
 #
 
 """
-Commonly used views throughout the Accounting application.
+Tests for the TransferWise admin.
 """

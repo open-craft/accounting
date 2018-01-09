@@ -21,7 +21,7 @@
 
 .DEFAULT_GOAL := help
 HELP_SPACING ?= 30
-COVERAGE_THRESHOLD ?= 60
+COVERAGE_THRESHOLD ?= 75
 WORKERS ?= 3
 WORKERS_LOW_PRIORITY ?= 3
 SHELL ?= /bin/bash
@@ -109,7 +109,7 @@ test.unit: clean ## Run all unit tests.
 	@echo "\nCoverage HTML report at file://`pwd`/build/coverage/index.html\n"
 	@coverage report --fail-under $(COVERAGE_THRESHOLD) || (echo "\nERROR: Coverage is below $(COVERAGE_THRESHOLD)%\n" && exit 2)
 
-test: clean test.quality test.unit test.migrations_missing ## Run all tests.
+test: clean test.quality test.migrations_missing test.unit ## Run all tests.
 	@echo "\nAll tests OK!\n"
 
 # We ignore `private.mk` so you can define your own make targets, or override some.

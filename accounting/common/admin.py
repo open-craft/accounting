@@ -26,4 +26,5 @@ from django.contrib import admin
 
 class UuidModelAdmin(admin.ModelAdmin):
     """ Admin configuration for the `UuidModel` model. """
+
     list_display = ('uuid',)

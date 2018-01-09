@@ -21,17 +21,15 @@
 Factories for testing the Address application.
 """
 
-from uuid import uuid4
-
 import factory
 
 from accounting.account import models
+from accounting.common.tests.factories import UuidFactory
 
 
-class AddressFactory(factory.DjangoModelFactory):
+class AddressFactory(UuidFactory):
     """ Factory for `models.Address`. """
 
-    uuid = factory.LazyFunction(uuid4)
     country = factory.Faker('country_code')
     address_line1 = factory.Faker('address')
     address_line2 = factory.Faker('address')

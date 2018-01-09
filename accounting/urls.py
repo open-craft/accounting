@@ -33,6 +33,8 @@ urlpatterns = [
     url(r'^bank/', include('accounting.bank.urls', namespace='bank')),
     url(r'^invoice/', include('accounting.invoice.urls', namespace='invoice')),
     url(r'^registration/', include('accounting.registration.urls', namespace='registration')),
+    url(r'^third_party/', include('accounting.third_party_api.urls', namespace='third_party')),
+    url(r'^transferwise/', include('accounting.transferwise.urls', namespace='transferwise')),
 ]
 
 if settings.DEBUG:
