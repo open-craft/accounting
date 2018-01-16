@@ -1,0 +1,7 @@
+Hello,
+
+At the beginning of each month, to help you gain time in invoicing your hours, I automatically build an invoice based on the worklogs you logged in Jira the month before.
+
+I just wanted to let you know that I'll be doing this soon -- I'll send you an invoice for {{ month }} to approve on {{ approval_date|date:"F jS" }}.
+
+Stay tuned!

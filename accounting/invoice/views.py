@@ -20,3 +20,44 @@
 """
 Invoice views.
 """
+
+from rest_framework import decorators, permissions, response, viewsets
+
+from accounting.invoice import choices, models
+
+
+class InvoiceViewSet(viewsets.ModelViewSet):
+    """
+    A view for retrieving and updating `Invoice` objects.
+    """
+
+    permission_classes = (permissions.IsAdminUser,)
+    queryset = models.Invoice.objects.all()
+    lookup_field = 'uuid'
+
+    @decorators.detail_route(
+        permission_classes=[permissions.AllowAny],
+        queryset=models.Invoice.objects.filter(approved=choices.InvoiceApproval.not_approved)
+    )
+    def approve(self, request, uuid=None):
+        """
+        Approve the invoice with UUID `uuid`.
+        """
+        invoice = self.get_object()
+        invoice.approved = choices.InvoiceApproval.manually
+        invoice.save()
+        return response.Response({'approved': True})
+
+    @decorators.detail_route(queryset=models.Invoice.objects.filter(paid=False))
+    def pay(self, request, uuid=None):
+        """
+        Pay the invoice with UUID `uuid`.
+        """
+        invoice = self.get_object()
+        invoice.paid = True
+        invoice.save()
+        return response.Response({
+            'paid': True,
+            'total': invoice.total_cost,
+            'currency': invoice.hourly_rate.hourly_rate_currency
+        })

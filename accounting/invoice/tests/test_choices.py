@@ -18,25 +18,20 @@
 #
 
 """
-Management command for generating data (usually for a development environment) to play with.
+Invoice choices tests.
 """
 
-import logging
-
-from django.core.management import BaseCommand
-
-LOGGER = logging.getLogger(__name__)
+from accounting.common.tests.base import TestCase
+from accounting.invoice import choices
 
 
-class Command(BaseCommand):
-    """
-    A management command to generate data for the Invoice application.
-    """
+class InvoicePreparationNotificationTestCase(TestCase):
+    """ Test cases for `tasks.send_invoice_prep_notification`. """
 
-    help = 'Generate data for the Invoice app, usually to play with in a development environment.'
+    def test_approved_choices(self):
+        """ The approved choices list matches those choices that actually count as being approved. """
+        self.assertEqual(choices.InvoiceApproval.approved_choices(), ['automatically', 'manually'])
 
-    def handle(self, *args, **options):
-        """
-        TODO: Implement.
-        """
-        pass
+    def test_not_approved_choices(self):
+        """ The not-approved choices list matches those choices that actually aren't counted as being approved. """
+        self.assertEqual(choices.InvoiceApproval.not_approved_choices(), ['not_approved'])

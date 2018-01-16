@@ -18,26 +18,31 @@
 #
 
 """
-Administration for Invoices.
+Invoice utilities.
 """
 
-from django.contrib import admin
-from simple_history.admin import SimpleHistoryAdmin
+from datetime import timedelta
+import datetime
 
-from accounting.common.admin import UuidModelAdmin
-from accounting.invoice import models
-
-
-@admin.register(models.Invoice)
-class InvoiceAdmin(UuidModelAdmin, SimpleHistoryAdmin):
-    """ Admin configuration for the `Invoice` model. """
-    list_display = UuidModelAdmin.list_display + ('number', 'provider', 'client', 'due_date', 'approved', 'paid',)
-    search_fields = ('provider__user__username', 'client__user__username',)
-    readonly_fields = ('pdf_path',)
+from django.utils import timezone
 
 
-@admin.register(models.LineItem)
-class LineItemAdmin(admin.ModelAdmin):
-    """ Admin configuration for the `LineItem` model. """
-    list_display = ('key', 'description', 'quantity', 'price',)
-    search_fields = ('key', 'invoice__uuid',)
+def get_last_day_past_month():
+    """
+    Return the `datetime` object representing the last day of the month that just passed.
+    """
+    return timezone.now().replace(day=1) - datetime.timedelta(days=1)
+
+
+def get_first_day_past_month():
+    """
+    Return the `datetime` object representing the first day of the month that just passed.
+    """
+    return get_last_day_past_month().replace(day=1)
+
+
+def get_day_with_offset(offset=20):
+    """
+    Return the `datetime` object representing the day which comes `offset` days after today.
+    """
+    return timezone.now() + timedelta(days=offset)

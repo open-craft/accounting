@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-03 16:54+0000\n"
+"POT-Creation-Date: 2018-01-19 12:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,25 +56,25 @@ msgstr ""
 msgid "Accounts"
 msgstr ""
 
-#: accounting/account/models.py:105
+#: accounting/account/models.py:113
 msgid "The hourly rate charged between a provider and client."
 msgstr ""
 
-#: accounting/account/models.py:108
+#: accounting/account/models.py:116
 msgid ""
 "The account linked to the user who gets paid the hourly rate by the client."
 msgstr ""
 
-#: accounting/account/models.py:111
+#: accounting/account/models.py:119
 msgid ""
 "The account linked to the user who pays the hourly rate to the provider."
 msgstr ""
 
-#: accounting/account/models.py:114
+#: accounting/account/models.py:122
 msgid "Hourly Rate"
 msgstr ""
 
-#: accounting/account/models.py:115
+#: accounting/account/models.py:123
 msgid "Hourly Rates"
 msgstr ""
 
@@ -158,125 +158,78 @@ msgid "Must include \"username\" and \"token\"."
 msgstr ""
 
 #: accounting/bank/choices.py:35
-msgid "BIC"
+msgid "BIC/SWIFT"
 msgstr ""
 
 #: accounting/bank/choices.py:36
-msgid "IBAN"
-msgstr ""
-
-#: accounting/bank/choices.py:37 accounting/bank/choices.py:47
-msgid "Routing Number"
-msgstr ""
-
-#: accounting/bank/choices.py:38
 msgid "Account Number"
 msgstr ""
 
-#: accounting/bank/choices.py:39
-msgid "Bank Code"
-msgstr ""
-
-#: accounting/bank/choices.py:40
-msgid "Bank Giro Number"
-msgstr ""
-
-#: accounting/bank/choices.py:41
-msgid "Bank Branch Code"
-msgstr ""
-
-#: accounting/bank/choices.py:42
-msgid "BSB Code"
-msgstr ""
-
-#: accounting/bank/choices.py:43
-msgid "Union Pay Card Number"
+#: accounting/bank/choices.py:37
+msgid "Currency"
 msgstr ""
 
 #: accounting/bank/choices.py:44
-msgid "CLABE"
-msgstr ""
-
-#: accounting/bank/choices.py:45
-msgid "IFSC Code"
-msgstr ""
-
-#: accounting/bank/choices.py:46
-msgid "Canadian Institution Number"
-msgstr ""
-
-#: accounting/bank/choices.py:48
-msgid "Bank Sort Code"
-msgstr ""
-
-#: accounting/bank/choices.py:49
-msgid "Bank SWIFT Code"
-msgstr ""
-
-#: accounting/bank/choices.py:50
-msgid "Transit Number"
-msgstr ""
-
-#: accounting/bank/choices.py:57
 msgid "Checking Account"
 msgstr ""
 
-#: accounting/bank/choices.py:58
+#: accounting/bank/choices.py:45
 msgid "Savings Account"
 msgstr ""
 
-#: accounting/bank/models.py:41
+#: accounting/bank/models.py:40
 msgid "The official name of the bank."
 msgstr ""
 
-#: accounting/bank/models.py:44
+#: accounting/bank/models.py:43
 msgid "The address of this bank."
 msgstr ""
 
-#: accounting/bank/models.py:47
+#: accounting/bank/models.py:46
 msgid "Bank"
 msgstr ""
 
-#: accounting/bank/models.py:48
+#: accounting/bank/models.py:47
 msgid "Banks"
 msgstr ""
 
-#: accounting/bank/models.py:76
+#: accounting/bank/models.py:73
 msgid "The bank to which this bank account belongs."
 msgstr ""
 
-#: accounting/bank/models.py:79
+#: accounting/bank/models.py:76
 msgid ""
 "The user account that this bank account is linked to. A user can have "
 "multiple bank accounts associated with their user account."
 msgstr ""
 
-#: accounting/bank/models.py:82
-msgid "The currency expected to be held in this bank account."
-msgstr ""
-
-#: accounting/bank/models.py:85
+#: accounting/bank/models.py:80
 msgid "Whether this is a checking or savings account."
 msgstr ""
 
-#: accounting/bank/models.py:88
+#: accounting/bank/models.py:83
 msgid ""
-"The unique combination of identification information for this bank account."
+"The TransferWise recipient ID used to identify recipient accounts which "
+"contain bank account information."
 msgstr ""
 
-#: accounting/bank/models.py:91
+#: accounting/bank/models.py:87
+msgid "Unique identification information for this bank account."
+msgstr ""
+
+#: accounting/bank/models.py:90
 msgid "Bank Account"
 msgstr ""
 
-#: accounting/bank/models.py:92
+#: accounting/bank/models.py:91
 msgid "Bank Accounts"
 msgstr ""
 
-#: accounting/common/models.py:48
+#: accounting/common/models.py:54
 msgid "UUID"
 msgstr ""
 
-#: accounting/common/models.py:49
+#: accounting/common/models.py:55
 msgid "The universally unique identifier for this model instance."
 msgstr ""
 
@@ -284,48 +237,60 @@ msgstr ""
 msgid "Default"
 msgstr ""
 
-#: accounting/invoice/choices.py:40
-msgid "Without Bank Account"
+#: accounting/invoice/choices.py:46
+msgid "Automatically"
 msgstr ""
 
-#: accounting/invoice/models.py:78
+#: accounting/invoice/choices.py:47
+msgid "Manually"
+msgstr ""
+
+#: accounting/invoice/choices.py:48
+msgid "Not Approved"
+msgstr ""
+
+#: accounting/invoice/models.py:75
 msgid ""
 "The unique invoice number. Defaults to yyyy-mm for the current year and "
 "month."
 msgstr ""
 
-#: accounting/invoice/models.py:82
+#: accounting/invoice/models.py:79
 msgid ""
 "The date this invoice was created and sent for billing purposes. Defaults to "
 "right now, but can be changed."
 msgstr ""
 
-#: accounting/invoice/models.py:86
+#: accounting/invoice/models.py:83
 msgid ""
 "The first date for which the line items in this invoice were provided. "
 "Defaults to the first day of the past month."
 msgstr ""
 
-#: accounting/invoice/models.py:90
+#: accounting/invoice/models.py:87
 msgid ""
 "The last date for which the line items in this invoice were provided. "
 "Defaults to the last day of the past month."
 msgstr ""
 
-#: accounting/invoice/models.py:94
+#: accounting/invoice/models.py:91
 msgid "When this invoice should be paid."
 msgstr ""
 
-#: accounting/invoice/models.py:97
+#: accounting/invoice/models.py:94
 msgid "The invoicing service/product provider."
 msgstr ""
 
-#: accounting/invoice/models.py:100
+#: accounting/invoice/models.py:97
 msgid "The client being invoiced for services/products."
 msgstr ""
 
-#: accounting/invoice/models.py:103
+#: accounting/invoice/models.py:100
 msgid "Whether this invoice has been paid by the client yet or not."
+msgstr ""
+
+#: accounting/invoice/models.py:103
+msgid "The approval status of this invoice."
 msgstr ""
 
 #: accounting/invoice/models.py:106
@@ -345,71 +310,164 @@ msgstr ""
 msgid "The template to use to generate this invoice."
 msgstr ""
 
+#: accounting/invoice/models.py:117
+msgid "The absolute URL that can be used to retrieve the invoice PDF."
+msgstr ""
+
 #: accounting/invoice/models.py:121
-msgid ""
-"Whether this invoice should automatically download JIRA worklogs for the "
-"provider to fill up the invoice."
-msgstr ""
-
-#: accounting/invoice/models.py:125
-msgid "Whether this invoice should be converted to a PDF on save."
-msgstr ""
-
-#: accounting/invoice/models.py:128
-msgid ""
-"Whether this invoice should be uploaded to Google Drive when converted to a "
-"PDF on save."
-msgstr ""
-
-#: accounting/invoice/models.py:131
 msgid "Invoice"
 msgstr ""
 
-#: accounting/invoice/models.py:132
+#: accounting/invoice/models.py:122
 msgid "Invoices"
 msgstr ""
 
-#: accounting/invoice/models.py:358
+#: accounting/invoice/models.py:298
 msgid "The invoice to which this line item belongs."
 msgstr ""
 
-#: accounting/invoice/models.py:360
+#: accounting/invoice/models.py:300
 msgid ""
 "An ID for this line item, unique with the line item key. Can be used to "
 "store incoming ID data from 3rd parties."
 msgstr ""
 
-#: accounting/invoice/models.py:364
+#: accounting/invoice/models.py:304
 msgid "The key identifier for this line item. For example: OC-9999."
 msgstr ""
 
-#: accounting/invoice/models.py:368
+#: accounting/invoice/models.py:308
 msgid "What the item is, i.e. a formal title or summary of the item."
 msgstr ""
 
-#: accounting/invoice/models.py:371
+#: accounting/invoice/models.py:311
 msgid ""
 "What this line item is about. Optional: this will only display on invoices "
 "that have the description column."
 msgstr ""
 
-#: accounting/invoice/models.py:375
+#: accounting/invoice/models.py:315
 msgid "How many of these items should be billed."
 msgstr ""
 
-#: accounting/invoice/models.py:378
+#: accounting/invoice/models.py:318
 msgid "How much each unit of this line item costs, including the currency."
 msgstr ""
 
-#: accounting/invoice/models.py:381
+#: accounting/invoice/models.py:321
 msgid ""
 "A special tag for this line item. Can be used to group line items by tag."
 msgstr ""
 
-#: accounting/invoice/models.py:384
+#: accounting/invoice/models.py:324
 msgid "Line Item"
 msgstr ""
 
-#: accounting/invoice/models.py:385
+#: accounting/invoice/models.py:325
 msgid "Line Items"
+msgstr ""
+
+#: accounting/transferwise/choices.py:32
+msgid "Recipient Identifier"
+msgstr ""
+
+#: accounting/transferwise/choices.py:33
+msgid "Recipient Name"
+msgstr ""
+
+#: accounting/transferwise/choices.py:34
+msgid "Recipient Account Identifier"
+msgstr ""
+
+#: accounting/transferwise/choices.py:35
+msgid "Source Currency"
+msgstr ""
+
+#: accounting/transferwise/choices.py:36
+msgid "Target Currency"
+msgstr ""
+
+#: accounting/transferwise/choices.py:37
+msgid "Amount Currency"
+msgstr ""
+
+#: accounting/transferwise/choices.py:38
+msgid "Transfer Amount"
+msgstr ""
+
+#: accounting/transferwise/choices.py:39
+msgid "Payment Reference"
+msgstr ""
+
+#: accounting/transferwise/models.py:49
+msgid ""
+"The date this bulk payment was created and uploaded to TransferWise. "
+"Defaults to right now, but can be changed."
+msgstr ""
+
+#: accounting/transferwise/models.py:53
+msgid ""
+"The start of the date interval for which to consider unpaid invoices for. "
+"Defaults to an ancient date."
+msgstr ""
+
+#: accounting/transferwise/models.py:57
+msgid ""
+"The end of the date interval for which to consider unpaid invoices for. "
+"Defaults to the last day of the past month."
+msgstr ""
+
+#: accounting/transferwise/models.py:61
+msgid ""
+"The sender of the TransferWise bulk payment. Refers to the account owner of "
+"the account initiating the payment."
+msgstr ""
+
+#: accounting/transferwise/models.py:65
+msgid "The absolute URL that can be used to retrieve the bulk payment CSV."
+msgstr ""
+
+#: accounting/transferwise/models.py:71
+msgid ""
+"Whether TransferWise payments should automatically be created on save. Note "
+"that currently, this does not create actual TransferWise payments through "
+"TransferWise! It only creates them internally to track different data easily."
+msgstr ""
+
+#: accounting/transferwise/models.py:76
+msgid "Whether this bulk payment should be converted into a CSV file on save."
+msgstr ""
+
+#: accounting/transferwise/models.py:79
+msgid ""
+"Whether this bulk payment CSV should be uploaded to Google Drive on save."
+msgstr ""
+
+#: accounting/transferwise/models.py:82
+msgid "TransferWise Bulk Payment"
+msgstr ""
+
+#: accounting/transferwise/models.py:83
+msgid "TransferWise Bulk Payments"
+msgstr ""
+
+#: accounting/transferwise/models.py:150
+msgid ""
+"The date this payment was made. Defaults to right now, but can be changed."
+msgstr ""
+
+#: accounting/transferwise/models.py:154
+msgid "The TransferWise bulk payment that this payment may be a part of."
+msgstr ""
+
+#: accounting/transferwise/models.py:157
+msgid "The invoice to which this TransferWise payment belongs."
+msgstr ""
+
+#: accounting/transferwise/models.py:160
+msgid "TransferWise Payment"
+msgstr ""
+
+#: accounting/transferwise/models.py:161
+msgid "TransferWise Payments"
 msgstr ""

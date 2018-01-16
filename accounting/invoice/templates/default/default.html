@@ -41,9 +41,9 @@
             </div>
             <div id="invoice-metadata" class="col-xs-6">
               <span id="invoice-number">Invoice Number: {{ invoice.number }}</span><br>
-              <span id="invoice-created">Created: {{ invoice.date|date:"F d, Y" }}</span><br>
-              <span id="invoice-billing-dates">Billed for {{ invoice.billing_start_date|date:"F d, Y" }} to {{ invoice.billing_end_date|date:"F d, Y" }}</span>
-              <span id="invoice-due">Due: {{ invoice.due_date|date:"F d, Y" }}</span>
+              <span id="invoice-created">Created: {{ invoice.date|date:"F jS, Y" }}</span><br>
+              <span id="invoice-billing-dates">Billed for {{ invoice.billing_start_date|date:"F jS, Y" }} to {{ invoice.billing_end_date|date:"F jS, Y" }}</span><br>
+              <span id="invoice-due">Due: {{ invoice.due_date|date:"F jS, Y" }}</span>
             </div>
           </div>
           <div class="row">

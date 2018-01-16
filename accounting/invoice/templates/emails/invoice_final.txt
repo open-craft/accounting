@@ -1,0 +1,7 @@
+Hello,
+
+I have attached your finalized and approved invoice for {{ month }}.
+
+We are now proceeding to send the bank transfers, and you can expect payment to arrive in your bank account within 5-8 business days at most.
+
+If you have any issues, please contact {{ contact_email }}.

@@ -333,3 +333,10 @@ GOOGLE_DRIVE_ROOT = env('GOOGLE_DRIVE_ROOT', default='')
 
 INVOICE_PDF_PATH = env('INVOICE_PDF_PATH', default=MEDIA_ROOT)
 HTML_TO_PDF_BINARY_PATH = env('HTML_TO_PDF_BINARY_PATH', default=root('wkhtmltopdf'))
+
+# BILLING CYCLE ###############################################################
+
+BILLING_CYCLE_USERS = env.list('BILLING_CYCLE_USERS', default=['opencraft'])
+INVOICE_NOTIFICATION_DAY = env('INVOICE_NOTIFICATION_DAY', default="1")
+INVOICE_APPROVAL_DAY = env('INVOICE_APPROVAL_DAY', default="3")
+INVOICE_FINAL_DAY = env('INVOICE_FINAL_DAY', default="5")

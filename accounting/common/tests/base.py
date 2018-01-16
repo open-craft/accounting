@@ -21,16 +21,37 @@
 Base classes for test classes throughout the Accounting service.
 """
 
+from django.contrib.sites.models import Site
 from django.test import TestCase as DjangoTestCase
 
+from accounting.account.tests.factories import AccountFactory, HourlyRateFactory
 from accounting.invoice.models import Invoice
 
 
 class TestCase(DjangoTestCase):
     """ Common test case for test classes throughout the Accounting service. """
 
+    def setUp(self):
+        """ Set up test objects. """
+        Site.objects.all().delete()
+        Site.objects.create(id=1, domain='https://billing.opencraft.com')
+        super().setUp()
+
     def tearDown(self):
         """ Delete any leftover files. """
         for invoice in Invoice.objects.all():
             invoice.extra_image.delete()
         super().tearDown()
+
+    def create_client_and_provider_links(self):
+        """ Create a client and some providers, and link them with hourly rates. """
+        # pylint: disable=attribute-defined-outside-init
+        self.client = AccountFactory(
+            business_name='OpenCraft GmbH',
+            user__username='opencraft',
+            user__email='billing@opencraft.com'
+        )
+        self.provider1 = AccountFactory()
+        self.provider2 = AccountFactory()
+        HourlyRateFactory(client=self.client, provider=self.provider1)
+        HourlyRateFactory(client=self.client, provider=self.provider2)
