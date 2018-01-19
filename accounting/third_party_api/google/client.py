@@ -21,7 +21,6 @@
 Google API Client to be used by the Accounting service.
 """
 
-
 from pydrive.drive import GoogleDrive as UpstreamGoogleDrive
 
 

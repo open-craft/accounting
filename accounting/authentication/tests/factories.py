@@ -22,17 +22,15 @@
 Factories for testing the Account application.
 """
 
-from uuid import uuid4
-
 import factory
 
 from accounting.authentication import models
+from accounting.common.tests.factories import UuidFactory
 
 
-class UserFactory(factory.DjangoModelFactory):
+class UserFactory(UuidFactory):
     """ Factory for `models.User`. """
 
-    uuid = factory.LazyFunction(uuid4)
     username = factory.Faker('user_name')
     password = 'password'
     email = factory.Faker('email')

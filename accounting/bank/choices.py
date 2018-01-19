@@ -33,7 +33,8 @@ class BankAccountIdentifiers(DjangoChoices):
     It should be kept up to date depending on the API version used.
     """
     BIC_SWIFT = ChoiceItem('bic_swift', _('BIC/SWIFT'))
-    ACCOUNT_NUMBER = ChoiceItem('accountNumber', _('Account Number'))
+    ACCOUNT_NUMBER = ChoiceItem('account_number', _('Account Number'))
+    CURRENCY = ChoiceItem('currency', _('Currency'))
 
 
 class BankAccountType(DjangoChoices):

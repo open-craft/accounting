@@ -57,6 +57,7 @@ LOCAL_APPS = (
     'accounting.invoice',
     'accounting.registration',
     'accounting.third_party_api',
+    'accounting.transferwise',
 )
 
 INSTALLED_APPS = (
@@ -240,7 +241,7 @@ ADMINS = env.json('ADMINS', default=set())
 
 # LOGGING #####################################################################
 
-BASE_HANDLERS = env.json('BASE_HANDLERS', default=["accounting", "mail_admins"])
+BASE_HANDLERS = env.json('BASE_HANDLERS', default=["file", "accounting", "mail_admins"])
 HANDLERS = BASE_HANDLERS
 LOGGING_ROTATE_MAX_KBYTES = env.json('LOGGING_ROTATE_MAX_KBYTES', default=10 * 1024)
 LOGGING_ROTATE_MAX_FILES = env.json('LOGGING_ROTATE_MAX_FILES', default=60)
@@ -298,6 +299,16 @@ LOGGING = {
         }
     }
 }
+
+if 'file' in HANDLERS:
+    LOGGING['handlers']['file'] = {
+        'level': 'DEBUG',
+        'class': 'accounting.common.logging.GzipRotatingFileHandler',
+        'filename': 'log/accounting.{}.log'.format(env('HONCHO_PROCESS_NAME', default='main')),
+        'maxBytes': LOGGING_ROTATE_MAX_KBYTES * 1024,
+        'backupCount': LOGGING_ROTATE_MAX_FILES,
+        'formatter': 'verbose'
+    }
 
 # MONEY #######################################################################
 

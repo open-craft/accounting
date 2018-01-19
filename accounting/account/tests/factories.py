@@ -21,7 +21,6 @@
 Factories for testing the Account application.
 """
 
-from uuid import uuid4
 import string
 
 from djmoney.money import Money
@@ -32,6 +31,7 @@ import factory  # pylint: disable=ungrouped-imports
 from accounting.account import models
 from accounting.address.tests.factories import AddressFactory
 from accounting.authentication.tests.factories import UserFactory
+from accounting.common.tests.factories import UuidFactory
 
 
 class MoneyFactory(factory.Factory):
@@ -44,10 +44,9 @@ class MoneyFactory(factory.Factory):
         model = Money
 
 
-class AccountFactory(factory.DjangoModelFactory):
+class AccountFactory(UuidFactory):
     """ Factory for `models.Account`. """
 
-    uuid = factory.LazyFunction(uuid4)
     user = factory.SubFactory(UserFactory)
     address = factory.SubFactory(AddressFactory)
     business_name = factory.Faker('company')
@@ -58,10 +57,9 @@ class AccountFactory(factory.DjangoModelFactory):
         model = models.Account
 
 
-class HourlyRateFactory(factory.DjangoModelFactory):
+class HourlyRateFactory(UuidFactory):
     """ Factory for `models.HourlyRate. """
 
-    uuid = factory.LazyFunction(uuid4)
     hourly_rate = factory.SubFactory(MoneyFactory)
     provider = factory.SubFactory(AccountFactory)
     client = factory.SubFactory(AccountFactory)

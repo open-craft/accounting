@@ -37,7 +37,7 @@ class InvoiceAdmin(UuidModelAdmin, SimpleHistoryAdmin):
 
 
 @admin.register(models.LineItem)
-class LineItemAdmin(UuidModelAdmin, SimpleHistoryAdmin):
+class LineItemAdmin(admin.ModelAdmin):
     """ Admin configuration for the `LineItem` model. """
     list_display = ('key', 'description', 'quantity', 'price',)
     search_fields = ('key', 'invoice__uuid',)

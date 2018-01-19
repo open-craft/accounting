@@ -103,9 +103,9 @@
 
             <tr class="total">
               <td colspan="2" class="column column-key column-name"></td>
-              <td class="column column-quantity">{{ total_quantity|floatformat:2 }}</td>
+              <td class="column column-quantity">{{ invoice.total_quantity|floatformat:2 }}</td>
               <td class="column column-price"></td>
-              <td class="column column-total">{{ total_cost|floatformat:2 }} {{ currency }}</td>
+              <td class="column column-total">{{ invoice.total_cost|floatformat:2 }} {{ currency }}</td>
             </tr>
           </table>
         </main>

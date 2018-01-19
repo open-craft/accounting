@@ -42,8 +42,7 @@ from accounting.account.models import Account
 from accounting.common.models import CommonModel, UuidModel
 from accounting.invoice import utils
 from accounting.invoice.choices import InvoiceTemplate
-from accounting.third_party_api.google.auth import GoogleAuth
-from accounting.third_party_api.google.client import GoogleDrive
+from accounting.third_party_api.google.mixins import GoogleDriveMixin
 from accounting.third_party_api.jira.client import Jira
 
 LOGGER = logging.getLogger(__name__)
@@ -57,7 +56,7 @@ def get_day_with_offset(offset=INVOICE_DUE_DATE_DAYS_OFFSET):
     return timezone.now() + timedelta(days=offset)
 
 
-class Invoice(CommonModel, UuidModel):
+class Invoice(CommonModel, UuidModel, GoogleDriveMixin):
     """
     A model to hold all data related to an invoice.
 
@@ -117,7 +116,7 @@ class Invoice(CommonModel, UuidModel):
         help_text=_("The absolute URL that can be used to retrieve the invoice PDF."))
     history = HistoricalRecords()
 
-    # TODO: The following 2 fields are temporary while we don't have a UI besides the Django admin.
+    # TODO: The following 3 fields are temporary while we don't have a UI besides the Django admin.
     # TODO: The front-end will eventually call endpoints to do what these fields allow us to do.
     auto_download_jira_worklogs_on_save = models.BooleanField(  # pylint: disable=invalid-name
         default=False,
@@ -162,6 +161,22 @@ class Invoice(CommonModel, UuidModel):
             provider=self.provider.user.username,
             client=self.client.user.username,
         )
+
+    @property
+    def total_quantity(self):
+        """
+        Get the total quantity of all line items on the invoice.
+        """
+        aggregated_quantity = self.aggregate_line_items().aggregate(total_quantity=models.Sum('quantity'))
+        return aggregated_quantity['total_quantity']
+
+    @property
+    def total_cost(self):
+        """
+        Get the total cost of all line items on the invoice.
+        """
+        aggregated_cost = self.aggregate_line_items().aggregate(total_cost=models.Sum('total'))
+        return aggregated_cost['total_cost']
 
     def aggregate_line_items(self, fields=None):
         """
@@ -259,11 +274,6 @@ class Invoice(CommonModel, UuidModel):
 
         TODO: This should be a synchronous job on a non-web worker.
         """
-        # Get an aggregated set of data to reduce the length of the invoice.
-        aggregated_line_items = self.aggregate_line_items()
-        aggregated_quantity = aggregated_line_items.aggregate(total_quantity=models.Sum('quantity'))
-        aggregated_cost = aggregated_line_items.aggregate(total_cost=models.Sum('total'))
-
         template = get_template('{template}/{template}.html'.format(template=self.template))
         invoice = template.render({
             'site': Site.objects.get_current(),
@@ -272,55 +282,12 @@ class Invoice(CommonModel, UuidModel):
                 ('provider', self.provider),
                 ('client', self.client),
             ),
-            'line_items': aggregated_line_items,
-            'total_quantity': aggregated_quantity['total_quantity'],
-            'total_cost': aggregated_cost['total_cost'],
+            'line_items': self.aggregate_line_items(),
             'currency': self.hourly_rate.hourly_rate_currency
         })
         self.pdf_path = os.path.join(settings.INVOICE_PDF_PATH, '{}.pdf'.format(uuid.uuid4()))
         pdf_configuration = pdfkit.configuration(wkhtmltopdf=settings.HTML_TO_PDF_BINARY_PATH)
         pdfkit.from_string(invoice, self.pdf_path, configuration=pdf_configuration, options=self.PDF_OPTIONS)
-
-    def upload_to_google_drive(self):  # NOQA
-        """
-        Upload the invoice in some file format to Google Drive.
-
-        Assumes the invoice has already been turned into a file, i.e. a PDF.
-        Assumes a _very_ specific file structure right now. For example:
-            |- 2016
-            |- 2017
-            |   |- blah
-            |   |- ...
-            |   |- invoices-in
-            |   |   |- 1
-            |   |   |- 2
-            |   |   |- ...
-            |   |   |- 12
-            |   |   |   |- invoice_1.pdf
-            |   |   |   |- ...
-            |   |   |   |- invoice_n.pdf
-            |- 2018
-
-        TODO: This should be a synchronous job on a non-web worker.
-        """
-        if not settings.ENABLE_GOOGLE:
-            return
-
-        gauth = GoogleAuth()
-        gauth.ServiceAuth()
-        drive = GoogleDrive(gauth)
-        month_folder = drive.get_folder_id(
-            settings.GOOGLE_DRIVE_ROOT,
-            path=[self.date.strftime('%Y'), 'invoices-in', self.date.strftime('%m')]
-        )
-        file = drive.CreateFile({
-            'title': self.pdf_filename,
-            'parents': [{'id': month_folder}]
-        })
-        file.SetContentFile(self.pdf_path)
-        file.Upload()
-        self.pdf_path = file['webContentLink']
-        Invoice.objects.filter(pk=self.pk).update(pdf_path=self.pdf_path)
 
     def save(self, *args, **kwargs):
         """
@@ -332,7 +299,14 @@ class Invoice(CommonModel, UuidModel):
         if self.auto_create_pdf_on_save:
             self.to_pdf()
         if self.auto_upload_google_drive_on_save:
-            self.upload_to_google_drive()
+            file = self.upload_to_google_drive(
+                file_path=self.pdf_path,
+                target_path=[self.date.strftime('%Y'), 'invoices-in', self.date.strftime('%m')],
+                title=self.pdf_filename,
+            )
+            # We can't save this field because we're already in the save method, so set it and then update it directly.
+            self.pdf_path = file['webContentLink']
+            Invoice.objects.filter(pk=self.pk).update(pdf_path=self.pdf_path)
 
 
 class LineItem(CommonModel):

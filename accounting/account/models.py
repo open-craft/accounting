@@ -89,6 +89,14 @@ class Account(CommonModel, UuidModel):
         """
         return self.business_name or self.user.get_full_name() or self.user.username
 
+    @property
+    def active_bank_account(self):
+        """
+        Return the user's currently active bank account.
+        """
+        # TODO: Make it so only one bank account can be 'active' at a time.
+        return self.bank_accounts.first()
+
 
 class HourlyRate(CommonModel, UuidModel):
     """

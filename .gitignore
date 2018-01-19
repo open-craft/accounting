@@ -116,3 +116,10 @@ media/*
 
 # Vagrant related.
 .vagrant
+
+# PyCharm
+.idea/
+
+# Generated logs
+log/*
+!log/.gitkeep

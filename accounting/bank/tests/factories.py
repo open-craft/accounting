@@ -21,8 +21,6 @@
 Factories for testing the Bank application.
 """
 
-from uuid import uuid4
-
 from factory import fuzzy
 import factory
 
@@ -30,12 +28,12 @@ from accounting.account.tests.factories import AccountFactory
 from accounting.address.tests.factories import AddressFactory
 from accounting.bank import models
 from accounting.bank.choices import BankAccountType
+from accounting.common.tests.factories import UuidFactory
 
 
-class BankFactory(factory.DjangoModelFactory):
+class BankFactory(UuidFactory):
     """ Factory for `models.Bank`. """
 
-    uuid = factory.LazyFunction(uuid4)
     name = factory.Faker('company')
     address = factory.SubFactory(AddressFactory)
 
@@ -43,13 +41,13 @@ class BankFactory(factory.DjangoModelFactory):
         model = models.Bank
 
 
-class BankAccountFactory(factory.DjangoModelFactory):
+class BankAccountFactory(UuidFactory):
     """ Factory for `models.BankAccount`. """
 
-    uuid = factory.LazyFunction(uuid4)
     bank = factory.SubFactory(BankFactory)
     user_account = factory.SubFactory(AccountFactory)
     type = fuzzy.FuzzyChoice([BankAccountType.CHECKING, BankAccountType.SAVINGS])
+    transferwise_recipient_id = fuzzy.FuzzyInteger(1, high=99999)
 
     class Meta:
         model = models.BankAccount

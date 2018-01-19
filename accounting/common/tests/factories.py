@@ -18,5 +18,21 @@
 #
 
 """
-Views for third party APIs.
+Factories for common models.
 """
+
+from uuid import uuid4
+
+import factory
+
+from accounting.common import models
+
+
+class UuidFactory(factory.DjangoModelFactory):
+    """ Factory for `models.UuidModel`. """
+
+    uuid = factory.LazyFunction(uuid4)
+
+    class Meta:
+        model = models.UuidModel
+        abstract = True

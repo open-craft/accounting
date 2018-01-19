@@ -38,6 +38,12 @@ class CommonModel(ValidateModelMixin, TimeStampedModel):
     class Meta:
         abstract = True
 
+    def __repr__(self):
+        """
+        Representation for this model.
+        """
+        return self.__str__()
+
 
 class UuidModel(models.Model):
     """
