@@ -58,6 +58,27 @@ def resolve_dict_callables(dictionary, *args):
     return new_dict
 
 
+def upload_invoice_to_google_drive(invoice, draft_invoice=False):
+    """
+    Upload an invoice to Google Drive.
+
+    :param invoice: The invoice to upload.
+    :param draft_invoice: Whether this invoice should be uploaded into a 'draft' directory.
+    :return:
+    """
+    target_path = [invoice.date.strftime('%Y'), 'invoices-in', invoice.date.strftime('%m')]
+    if draft_invoice:
+        # Insert a draft folder before the last invoice-containing folder.
+        target_path.insert(-1, 'draft')
+    file = invoice.upload_to_google_drive(
+        file_path=invoice.pdf_path,
+        target_path=target_path,
+        title=invoice.pdf_filename,
+    )
+    invoice.pdf_path = file['webContentLink']
+    invoice.save()
+
+
 # pylint: disable=too-many-arguments,too-many-locals
 def send_email_with_invoice(template, subject, extra_email_context=None, client_usernames=settings.BILLING_CYCLE_USERS,
                             create_invoice=False, draft_invoice=False, fill_line_items_from_jira=False,
@@ -85,22 +106,29 @@ def send_email_with_invoice(template, subject, extra_email_context=None, client_
     template = get_template(template)
     for client_username in client_usernames:
         client = Account.objects.get(user__username=client_username)
-        providers = [rate.provider for rate in client.client_hourly_rates.all()]
+        providers = [rate.provider for rate in client.client_hourly_rates.filter(active=True)]
         for provider in providers:
-            # Copy over certain details from the latest invoice from the proper month to the new invoice.
-            invoice = models.Invoice.objects.filter(
-                provider=provider,
-                client=client,
-                date__month=past.month if draft_invoice else now.month,
-            ).latest('date')
-            if create_invoice:
+            try:
+                invoice = models.Invoice.objects.filter(
+                    provider=provider,
+                    client=client,
+                    date__month=past.month if draft_invoice else now.month,
+                ).latest('date')
+            except models.Invoice.DoesNotExist:
+                # This may be the provider's first invoice.
+                invoice = None
+
+            if create_invoice or not invoice:
                 invoice = models.Invoice.objects.create(
-                    number=invoice.number,
-                    provider=invoice.provider,
-                    client=invoice.client,
-                    extra_text=invoice.extra_text,
-                    extra_image=invoice.extra_image,
-                    template=invoice.template,
+                    number=choices.InvoiceNumberingScheme.increment_value(
+                        invoice.template.numbering_scheme,
+                        invoice.number
+                    ) if invoice else choices.InvoiceNumberingScheme.default_value(
+                        provider.invoice_template.numbering_scheme
+                    ),
+                    provider=provider,
+                    client=client,
+                    template=provider.invoice_template,
                 )
             if fill_line_items_from_jira:
                 invoice.fill_line_items_from_jira()
@@ -120,16 +148,7 @@ def send_email_with_invoice(template, subject, extra_email_context=None, client_
 
             # Upload the invoice to a directory in GDrive.
             if upload_to_google_drive:
-                target_path = [invoice.date.strftime('%Y'), 'invoices-in', invoice.date.strftime('%m')]
-                if draft_invoice:
-                    # Insert a draft folder before the last invoice-containing folder.
-                    target_path.insert(-1, 'draft')
-                file = invoice.upload_to_google_drive(
-                    file_path=invoice.pdf_path,
-                    target_path=target_path,
-                    title=invoice.pdf_filename,
-                )
-                invoice.pdf_path = file['webContentLink']
+                upload_invoice_to_google_drive(invoice, draft_invoice=draft_invoice)
             if auto_approve and not invoice.is_approved:
                 invoice.approved = choices.InvoiceApproval.automatically
             invoice.save()

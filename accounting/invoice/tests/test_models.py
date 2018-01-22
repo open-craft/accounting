@@ -35,6 +35,22 @@ NOW = datetime.datetime(2018, 1, 10, 20, 31, 3, 350993, tzinfo=timezone.utc)
 
 
 @ddt.ddt
+class InvoiceTemplateTestCase(TestCase):
+    """ Test cases for `models.InvoiceTemplate`. """
+
+    def setUp(self):
+        """ Set up test objects. """
+        self.provider = AccountFactory(business_name='Developer', user__username='developer')
+        self.invoice_template = factories.InvoiceTemplateFactory(provider=self.provider)
+        super().setUp()
+
+    @ddt.data(str, repr)
+    def test_string_conversion(self, conversion_method):
+        """ String conversion works for both `str` and `repr`. """
+        self.assertEqual(conversion_method(self.invoice_template), "Developer's Invoice Template")
+
+
+@ddt.ddt
 class InvoiceTestCase(TestCase):
     """ Test cases for `models.Invoice`. """
 

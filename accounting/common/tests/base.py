@@ -25,7 +25,7 @@ from django.contrib.sites.models import Site
 from django.test import TestCase as DjangoTestCase
 
 from accounting.account.tests.factories import AccountFactory, HourlyRateFactory
-from accounting.invoice.models import Invoice
+from accounting.invoice.models import InvoiceTemplate
 
 
 class TestCase(DjangoTestCase):
@@ -39,8 +39,8 @@ class TestCase(DjangoTestCase):
 
     def tearDown(self):
         """ Delete any leftover files. """
-        for invoice in Invoice.objects.all():
-            invoice.extra_image.delete()
+        for invoice_template in InvoiceTemplate.objects.all():
+            invoice_template.extra_image.delete()
         super().tearDown()
 
     def create_client_and_provider_links(self):

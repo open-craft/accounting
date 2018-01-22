@@ -4,4 +4,6 @@ At the beginning of each month, to help you gain time in invoicing your hours, I
 
 I just wanted to let you know that I'll be doing this soon -- I'll send you an invoice for {{ month }} to approve on {{ approval_date|date:"F jS" }}.
 
-Stay tuned!
+Could you review your worklogs in Jira to ensure that they are accurate, before that date?
+
+Thank you!

@@ -117,6 +117,9 @@ class HourlyRate(CommonModel, UuidModel):
     client = models.ForeignKey(
         Account, models.CASCADE, related_name='client_hourly_rates', blank=True, null=True,
         help_text=_("The account linked to the user who pays the hourly rate to the provider."))
+    active = models.BooleanField(
+        default=True,
+        help_text=_("Whether this hourly rate relationship still exists between the provider and client or not."))
 
     class Meta:
         verbose_name = _('Hourly Rate')

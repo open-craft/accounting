@@ -40,7 +40,7 @@ import pdfkit
 from accounting.account.models import Account
 from accounting.common import utils
 from accounting.common.models import CommonModel, UuidModel
-from accounting.invoice.choices import InvoiceApproval, InvoiceTemplate
+from accounting.invoice.choices import InvoiceApproval, InvoiceHtmlTemplate, InvoiceNumberingScheme
 from accounting.third_party_api.google.mixins import GoogleDriveMixin
 from accounting.third_party_api.jira.client import Jira
 
@@ -52,6 +52,41 @@ def default_invoice_number():
     Return the invoice number which defaults to `yyyy-mm` for the current year and month.
     """
     return timezone.now().strftime("%Y-%m")
+
+
+class InvoiceTemplate(CommonModel, UuidModel):
+    """
+    A model that invoices can base off of.
+    """
+
+    provider = models.OneToOneField(
+        Account, on_delete=models.CASCADE, related_name='invoice_template',
+        help_text=_("The invoicing service/product provider."))
+    numbering_scheme = models.CharField(
+        max_length=80, choices=InvoiceNumberingScheme.choices, default=InvoiceNumberingScheme.default,
+        help_text=_("The numbering scheme used to determine how to increment the invoice number."))
+    extra_text = models.TextField(
+        blank=True, null=True,
+        help_text=_("Any arbitrary extra text that the provider would like to display on their invoice. "
+                    "The HTML template that belongs to this invoice template should have a designated location "
+                    "to place this extra text."))
+    extra_image = models.ImageField(
+        blank=True, null=True,
+        help_text=_("Any arbitrary extra image that the provider would like to display on their invoice. "
+                    "For example, this could be the provider's signature."))
+    html_template = models.CharField(
+        max_length=80, choices=InvoiceHtmlTemplate.choices, default=InvoiceHtmlTemplate.Default,
+        help_text=_("The template to use to generate an invoice."))
+
+    class Meta:
+        verbose_name = _('Invoice Template')
+        verbose_name_plural = _('Invoice Templates')
+
+    def __str__(self):
+        """
+        Indicate between who this invoice template belongs to.
+        """
+        return "{provider}'s Invoice Template".format(provider=self.provider)
 
 
 class Invoice(CommonModel, UuidModel, GoogleDriveMixin):
@@ -101,20 +136,12 @@ class Invoice(CommonModel, UuidModel, GoogleDriveMixin):
     approved = models.CharField(
         max_length=80, choices=InvoiceApproval.choices, default=InvoiceApproval.not_approved,
         help_text=_("The approval status of this invoice."))
-    extra_text = models.TextField(
-        blank=True, null=True,
-        help_text=_("Any arbitrary extra text that the provider would like to display on their invoice. "
-                    "Each template should have a designated location to place this extra text."))
-    extra_image = models.ImageField(
-        blank=True, null=True,
-        help_text=_("Any arbitrary extra image that the provider would like to display on their invoice. "
-                    "For example, this could be the provider's signature."))
-    template = models.CharField(
-        max_length=80, choices=InvoiceTemplate.choices, default=InvoiceTemplate.Default,
-        help_text=_("The template to use to generate this invoice."))
     pdf_path = models.URLField(
         blank=True, null=True, max_length=300,
         help_text=_("The absolute URL that can be used to retrieve the invoice PDF."))
+    template = models.ForeignKey(
+        InvoiceTemplate, on_delete=models.CASCADE, related_name='invoices', null=True,
+        help_text=_("The template to use to generate an invoice."))
     history = HistoricalRecords()
 
     class Meta:
@@ -172,6 +199,15 @@ class Invoice(CommonModel, UuidModel, GoogleDriveMixin):
         Return whether this invoice has been approved or not.
         """
         return self.approved in InvoiceApproval.approved_choices()
+
+    @property
+    def html_template(self):
+        """
+        Get the HTML template associated with this invoice.
+        """
+        if self.template:
+            return self.template.html_template
+        return InvoiceHtmlTemplate.Default
 
     def aggregate_line_items(self, fields=None):
         """
@@ -269,7 +305,7 @@ class Invoice(CommonModel, UuidModel, GoogleDriveMixin):
 
         TODO: This should be a synchronous job on a non-web worker.
         """
-        template = get_template('{template}/{template}.html'.format(template=self.template))
+        template = get_template('{template}/{template}.html'.format(template=self.html_template))
         invoice = template.render({
             'site': Site.objects.get_current(),
             'invoice': self,

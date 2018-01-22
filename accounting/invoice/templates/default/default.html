@@ -69,11 +69,11 @@
               </div>
             {% endfor %}
           </div>
-          {% if invoice.extra_text %}
+          {% if invoice.template.extra_text %}
             <div class="row">
               <div id="extra" class="col-xs-12">
                 <h5 class="extra-header"><strong>EXTRA</strong></h5>
-                <p id="extra-text">{{ invoice.extra_text|linebreaks }}</p>
+                <p id="extra-text">{{ invoice.template.extra_text|linebreaks }}</p>
               </div>
             </div>
           {% endif %}
@@ -113,8 +113,8 @@
         <footer>
           <div class="row">
             <div id="extra-image" class="col-xs-12">
-              {% if invoice.extra_image %}
-                <img id="extra-image-img" src="{{ invoice.extra_image.url }}">
+              {% if invoice.template.extra_image %}
+                <img id="extra-image-img" src="{{ invoice.template.extra_image.url }}">
               {% endif %}
             </div>
           </div>

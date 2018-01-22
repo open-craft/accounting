@@ -66,7 +66,9 @@ class InvoicePreparationNotificationTestCase(TestCase):
             "I just wanted to let you know that I'll be doing this soon -- I'll send you an invoice "
             "for December to approve on January 3rd.\n"
             "\n"
-            "Stay tuned!\n"
+            "Could you review your worklogs in Jira to ensure that they are accurate, before that date?\n"
+            "\n"
+            "Thank you!\n"
         ))
 
 
@@ -80,8 +82,12 @@ class InvoiceApprovalRequestTestCase(TestCase):
         self.create_client_and_provider_links()
 
         # Create invoices that are from the past. The task will use these to make new ones.
-        self.old_invoice1 = factories.InvoiceFactory(date=PAST, provider=self.provider1, client=self.client)
-        self.old_invoice2 = factories.InvoiceFactory(date=PAST, provider=self.provider2, client=self.client)
+        self.template1 = factories.InvoiceTemplateFactory(provider=self.provider1)
+        self.template2 = factories.InvoiceTemplateFactory(provider=self.provider2)
+        self.old_invoice1 = factories.InvoiceFactory(
+            date=PAST, provider=self.provider1, client=self.client, template=self.template1)
+        self.old_invoice2 = factories.InvoiceFactory(
+            date=PAST, provider=self.provider2, client=self.client, template=self.template2)
         super().setUp()
 
     @mock.patch.object(models.Invoice, 'upload_to_google_drive')

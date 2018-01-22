@@ -49,7 +49,7 @@ def send_invoice_prep_notification():
     template = get_template(constants.INVOICE_NOTIFICATION_TEMPLATE)
     for client_username in settings.BILLING_CYCLE_USERS:
         client = Account.objects.get(user__username=client_username)
-        provider_emails = [rate.provider.user.email for rate in client.client_hourly_rates.all()]
+        provider_emails = [rate.provider.user.email for rate in client.client_hourly_rates.filter(active=True)]
         message = template.render({'approval_date': approval_date, 'month': past_month})
         EmailMessage(
             subject=constants.INVOICE_NOTIFICATION_SUBJECT.format(month=past_month),
