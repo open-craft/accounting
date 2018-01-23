@@ -329,6 +329,11 @@ GOOGLE_AUTH_CLIENT_SERVICE_EMAIL = env('GOOGLE_AUTH_CLIENT_SERVICE_EMAIL', defau
 GOOGLE_AUTH_PKCS12_FILE_PATH = env('GOOGLE_AUTH_PKCS12_FILE_PATH', default=root('.p12'))
 GOOGLE_DRIVE_ROOT = env('GOOGLE_DRIVE_ROOT', default='')
 
+# TRANSFERWISE ################################################################
+
+TRANSFERWISE_BULK_PAYMENT_DAY = env('TRANSFERWISE_BULK_PAYMENT_DAY', default="6")
+TRANSFERWISE_BULK_PAYMENT_SENDER = env('TRANSFERWISE_BULK_PAYMENT_SENDER', default='opencraft')
+
 # HTML-to-PDF #################################################################
 
 INVOICE_PDF_PATH = env('INVOICE_PDF_PATH', default=MEDIA_ROOT)

@@ -23,7 +23,6 @@ Factories for testing the TransferWise application.
 
 import factory
 
-from accounting.account.tests.factories import AccountFactory
 from accounting.common.tests.factories import UuidFactory
 from accounting.invoice.tests.factories import InvoiceFactory
 from accounting.transferwise import models
@@ -32,7 +31,6 @@ from accounting.transferwise import models
 class TransferWiseBulkPaymentFactory(UuidFactory):
     """ Factory for `models.TransferWiseBulkPayment`. """
 
-    sender = factory.SubFactory(AccountFactory)
     csv_path = factory.Faker('uri')
 
     class Meta:

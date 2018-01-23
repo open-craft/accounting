@@ -22,7 +22,6 @@
 Tests for TransferWise models.
 """
 
-from unittest import mock
 import datetime
 
 from django.utils import timezone
@@ -47,7 +46,7 @@ class TransferWiseBulkPaymentTestCase(TestCase):
     def setUp(self):
         """ Set up test objects. """
         self.sender = AccountFactory(business_name='OpenCraft GmbH', user__username='opencraft')
-        self.bulk_payment = factories.TransferWiseBulkPaymentFactory(date=NOW, sender=self.sender)
+        self.bulk_payment = factories.TransferWiseBulkPaymentFactory(date=NOW)
         super().setUp()
 
     def _create_recipients(self, create_invoices=False, invoice_date=NOW):
@@ -120,30 +119,6 @@ class TransferWiseBulkPaymentTestCase(TestCase):
     def test_csv_filename(self):
         """ The CSV filename contains the proper sender and date. """
         self.assertEqual(self.bulk_payment.csv_filename, 'transferwise_bulk_payment_csv_opencraft_2018-01-10.csv')
-
-    @mock.patch.object(models.TransferWiseBulkPayment, 'create_payments')
-    def test_auto_create_payments_on_save(self, mock_create_payments):
-        """ `create_payments` is called when `auto_create_payments_on_save` is checked. """
-        self.bulk_payment.auto_create_payments_on_save = True
-        self.bulk_payment.save()
-        mock_create_payments.assert_called_once()
-
-    @mock.patch.object(models.TransferWiseBulkPayment, 'to_bulk_payment_csv')
-    def test_auto_create_csv_on_save(self, mock_to_bulk_payment_csv):
-        """ `to_bulk_payment_csv` is called when `auto_create_csv_on_save` is checked. """
-        self.bulk_payment.auto_create_csv_on_save = True
-        self.bulk_payment.save()
-        mock_to_bulk_payment_csv.assert_called_once()
-
-    @mock.patch.object(models.TransferWiseBulkPayment, 'upload_to_google_drive')
-    def test_auto_upload_google_drive_on_save(self, mock_upload_to_google_drive):
-        """ `upload_to_google_drive` is called when `auto_upload_google_drive_on_save` is checked. """
-        csv_path = 'https://drive.google.com/bulk_payment.csv'
-        mock_upload_to_google_drive.return_value = {'alternateLink': csv_path}
-        self.bulk_payment.auto_upload_google_drive_on_save = True  # pylint: disable=invalid-name,useless-suppression
-        self.bulk_payment.save()
-        mock_upload_to_google_drive.assert_called_once()
-        self.assertEqual(self.bulk_payment.csv_path, csv_path)
 
 
 @ddt.ddt

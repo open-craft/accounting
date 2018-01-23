@@ -21,6 +21,7 @@
 TransferWise models to be used by the Accounting service.
 """
 
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -56,27 +57,9 @@ class TransferWiseBulkPayment(CommonModel, UuidModel, TransferWiseCsvMixin, Goog
         default=timezone.now,
         help_text=_("The end of the date interval for which to consider unpaid invoices for. "
                     "Defaults to the last day of the past month."))
-    sender = models.ForeignKey(
-        Account, on_delete=models.CASCADE, related_name='transferwise_sender_bulk_payments',
-        help_text=_("The sender of the TransferWise bulk payment. "
-                    "Refers to the account owner of the account initiating the payment."))
     csv_path = models.URLField(
         blank=True, null=True, max_length=300,
         help_text=_("The absolute URL that can be used to retrieve the bulk payment CSV."))
-
-    # TODO: The following 3 fields are temporary.
-    # TODO: These will be automated through jobs at some point, generated at particular times of the month.
-    auto_create_payments_on_save = models.BooleanField(
-        default=False,
-        help_text=_("Whether TransferWise payments should automatically be created on save. "
-                    "Note that currently, this does not create actual TransferWise payments through TransferWise! "
-                    "It only creates them internally to track different data easily."))
-    auto_create_csv_on_save = models.BooleanField(
-        default=False,
-        help_text=_("Whether this bulk payment should be converted into a CSV file on save."))
-    auto_upload_google_drive_on_save = models.BooleanField(  # pylint: disable=invalid-name
-        default=False,
-        help_text=_("Whether this bulk payment CSV should be uploaded to Google Drive on save."))
 
     class Meta:
         verbose_name = _('TransferWise Bulk Payment')
@@ -98,6 +81,13 @@ class TransferWiseBulkPayment(CommonModel, UuidModel, TransferWiseCsvMixin, Goog
             date=self.date.strftime("%Y-%m-%d"),
         )
 
+    @property
+    def sender(self):
+        """
+        Return the sender account.
+        """
+        return Account.objects.get(user__username=settings.TRANSFERWISE_BULK_PAYMENT_SENDER)
+
     def create_payments(self):
         """
         Create the individual TransferWise payments needed for this bulk payment.
@@ -106,6 +96,7 @@ class TransferWiseBulkPayment(CommonModel, UuidModel, TransferWiseCsvMixin, Goog
 
         * Unpaid
         * Within this bulk payment's date range (start_date, end_date).
+        * Owned by a provider who's eligible for TransferWise transfers.
 
         Note that the invoice is the source of truth for payments, and thus should exist before making a payment.
 
@@ -114,30 +105,15 @@ class TransferWiseBulkPayment(CommonModel, UuidModel, TransferWiseCsvMixin, Goog
         TODO: we could then skip generating CSVs and create all the transfers in one go, and call them a 'bulk payment',
         TODO: even if that terminology is only to represent how we're doing it internally.
         """
-        unpaid_invoices = self.sender.client_invoices.filter(paid=False, date__range=(self.start_date, self.end_date))
+        unpaid_invoices = self.sender.client_invoices.filter(
+            paid=False,
+            date__range=(self.start_date, self.end_date),
+            provider__bank_accounts__transferwise_recipient_id__isnull=False,
+        )
         for unpaid_invoice in unpaid_invoices:
             self.payments.create(bulk_payment=self, invoice=unpaid_invoice)
             unpaid_invoice.paid = True
             unpaid_invoice.save()
-
-    def save(self, *args, **kwargs):
-        """
-        Convert the bulk payment to a CSV and/or upload it to Google Drive after a successful save.
-        """
-        super().save(**kwargs)
-        if self.auto_create_payments_on_save:
-            self.create_payments()
-        if self.auto_create_csv_on_save:
-            self.to_bulk_payment_csv(self.payments.all())
-        if self.auto_upload_google_drive_on_save:
-            file = self.upload_to_google_drive(
-                file_path=self.csv_path,
-                target_path=[self.date.strftime('%Y'), 'invoices-in', self.date.strftime('%m')],
-                title=self.csv_filename,
-            )
-            # We can't save this field because we're already in the save method, so set it and then update it directly.
-            self.csv_path = file['alternateLink']
-            TransferWiseBulkPayment.objects.filter(pk=self.pk).update(csv_path=self.csv_path)
 
 
 class TransferWisePayment(CommonModel, UuidModel):
