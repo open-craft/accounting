@@ -20,3 +20,30 @@
 """
 Tests for Address models.
 """
+
+import ddt
+
+from accounting.address.tests import factories
+from accounting.common.tests.base import TestCase
+
+
+@ddt.ddt
+class AddressTestCase(TestCase):
+    """ Test cases for `models.Address`. """
+
+    def setUp(self):
+        """ Set up test objects. """
+        self.address = factories.AddressFactory(
+            country='PK',
+            address_line1='Address Line 1',
+            address_line2='Address Line 2',
+            zipcode='99999',
+            city='City',
+            state='State',
+        )
+        super().setUp()
+
+    @ddt.data(str, repr)
+    def test_string_conversion(self, conversion_method):
+        """ String conversion works for both `str` and `repr`. """
+        self.assertEqual(conversion_method(self.address), 'Address Line 1 Address Line 2, City State 99999, PK')

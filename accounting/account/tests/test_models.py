@@ -20,3 +20,48 @@
 """
 Tests for Account models.
 """
+
+import ddt
+
+from accounting.account.tests import factories
+from accounting.common.tests.base import TestCase
+
+
+@ddt.ddt
+class AccountTestCase(TestCase):
+    """ Test cases for `models.Account`. """
+
+    def setUp(self):
+        """ Set up test objects. """
+        self.account = factories.AccountFactory(
+            business_name='OpenCraft GmbH',
+            user__username='opencraft'
+        )
+        super().setUp()
+
+    @ddt.data(str, repr)
+    def test_string_conversion(self, conversion_method):
+        """ String conversion works for both `str` and `repr`. """
+        self.assertEqual(conversion_method(self.account), 'OpenCraft GmbH')
+
+
+@ddt.ddt
+class HourlyRateTestCase(TestCase):
+    """ Test cases for `models.HourlyRate`. """
+
+    def setUp(self):
+        """ Set up test objects. """
+        self.client = factories.AccountFactory(business_name='OpenCraft GmbH')
+        self.provider = factories.AccountFactory(business_name='Developer')
+        self.hourly_rate = factories.HourlyRateFactory(
+            client=self.client,
+            provider=self.provider,
+            hourly_rate__amount=100,
+            hourly_rate__currency='EUR'
+        )
+        super().setUp()
+
+    @ddt.data(str, repr)
+    def test_string_conversion(self, conversion_method):
+        """ String conversion works for both `str` and `repr`. """
+        self.assertEqual(conversion_method(self.hourly_rate), 'Developer charges OpenCraft GmbH 100.00 EUR / hour')

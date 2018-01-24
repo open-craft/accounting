@@ -21,7 +21,6 @@
 Invoice models.
 """
 
-from datetime import timedelta
 import logging
 import os
 import uuid
@@ -39,21 +38,55 @@ from taggit.managers import TaggableManager
 import pdfkit
 
 from accounting.account.models import Account
+from accounting.common import utils
 from accounting.common.models import CommonModel, UuidModel
-from accounting.invoice import utils
-from accounting.invoice.choices import InvoiceTemplate
+from accounting.invoice.choices import InvoiceApproval, InvoiceHtmlTemplate, InvoiceNumberingScheme
 from accounting.third_party_api.google.mixins import GoogleDriveMixin
 from accounting.third_party_api.jira.client import Jira
 
 LOGGER = logging.getLogger(__name__)
-INVOICE_DUE_DATE_DAYS_OFFSET = 20
 
 
-def get_day_with_offset(offset=INVOICE_DUE_DATE_DAYS_OFFSET):
+def default_invoice_number():
     """
-    Return the `datetime` object representing the day which comes `offset` days after today.
+    Return the invoice number which defaults to `yyyy-mm` for the current year and month.
     """
-    return timezone.now() + timedelta(days=offset)
+    return timezone.now().strftime("%Y-%m")
+
+
+class InvoiceTemplate(CommonModel, UuidModel):
+    """
+    A model that invoices can base off of.
+    """
+
+    provider = models.OneToOneField(
+        Account, on_delete=models.CASCADE, related_name='invoice_template',
+        help_text=_("The invoicing service/product provider."))
+    numbering_scheme = models.CharField(
+        max_length=80, choices=InvoiceNumberingScheme.choices, default=InvoiceNumberingScheme.default,
+        help_text=_("The numbering scheme used to determine how to increment the invoice number."))
+    extra_text = models.TextField(
+        blank=True, null=True,
+        help_text=_("Any arbitrary extra text that the provider would like to display on their invoice. "
+                    "The HTML template that belongs to this invoice template should have a designated location "
+                    "to place this extra text."))
+    extra_image = models.ImageField(
+        blank=True, null=True,
+        help_text=_("Any arbitrary extra image that the provider would like to display on their invoice. "
+                    "For example, this could be the provider's signature."))
+    html_template = models.CharField(
+        max_length=80, choices=InvoiceHtmlTemplate.choices, default=InvoiceHtmlTemplate.Default,
+        help_text=_("The template to use to generate an invoice."))
+
+    class Meta:
+        verbose_name = _('Invoice Template')
+        verbose_name_plural = _('Invoice Templates')
+
+    def __str__(self):
+        """
+        Indicate between who this invoice template belongs to.
+        """
+        return "{provider}'s Invoice Template".format(provider=self.provider)
 
 
 class Invoice(CommonModel, UuidModel, GoogleDriveMixin):
@@ -73,7 +106,7 @@ class Invoice(CommonModel, UuidModel, GoogleDriveMixin):
     }
 
     number = models.CharField(
-        max_length=80, default=utils.default_invoice_number,
+        max_length=80, default=default_invoice_number,
         help_text=_("The unique invoice number. "
                     "Defaults to yyyy-mm for the current year and month."))
     date = models.DateTimeField(
@@ -89,7 +122,7 @@ class Invoice(CommonModel, UuidModel, GoogleDriveMixin):
         help_text=_("The last date for which the line items in this invoice were provided. "
                     "Defaults to the last day of the past month."))
     due_date = models.DateTimeField(
-        default=get_day_with_offset,
+        default=utils.get_day_with_offset,
         help_text=_("When this invoice should be paid."))
     provider = models.ForeignKey(
         Account, on_delete=models.CASCADE, related_name='provider_invoices',
@@ -100,34 +133,16 @@ class Invoice(CommonModel, UuidModel, GoogleDriveMixin):
     paid = models.BooleanField(
         default=False,
         help_text=_("Whether this invoice has been paid by the client yet or not."))
-    extra_text = models.TextField(
-        blank=True, null=True,
-        help_text=_("Any arbitrary extra text that the provider would like to display on their invoice. "
-                    "Each template should have a designated location to place this extra text."))
-    extra_image = models.ImageField(
-        blank=True, null=True,
-        help_text=_("Any arbitrary extra image that the provider would like to display on their invoice. "
-                    "For example, this could be the provider's signature."))
-    template = models.CharField(
-        max_length=80, choices=InvoiceTemplate.choices, default=InvoiceTemplate.Default,
-        help_text=_("The template to use to generate this invoice."))
+    approved = models.CharField(
+        max_length=80, choices=InvoiceApproval.choices, default=InvoiceApproval.not_approved,
+        help_text=_("The approval status of this invoice."))
     pdf_path = models.URLField(
         blank=True, null=True, max_length=300,
         help_text=_("The absolute URL that can be used to retrieve the invoice PDF."))
+    template = models.ForeignKey(
+        InvoiceTemplate, on_delete=models.CASCADE, related_name='invoices', null=True,
+        help_text=_("The template to use to generate an invoice."))
     history = HistoricalRecords()
-
-    # TODO: The following 3 fields are temporary while we don't have a UI besides the Django admin.
-    # TODO: The front-end will eventually call endpoints to do what these fields allow us to do.
-    auto_download_jira_worklogs_on_save = models.BooleanField(  # pylint: disable=invalid-name
-        default=False,
-        help_text=_("Whether this invoice should automatically download JIRA worklogs "
-                    "for the provider to fill up the invoice."))
-    auto_create_pdf_on_save = models.BooleanField(
-        default=False,
-        help_text=_("Whether this invoice should be converted to a PDF on save."))
-    auto_upload_google_drive_on_save = models.BooleanField(  # pylint: disable=invalid-name
-        default=False,
-        help_text=_("Whether this invoice should be uploaded to Google Drive when converted to a PDF on save."))
 
     class Meta:
         verbose_name = _('Invoice')
@@ -177,6 +192,22 @@ class Invoice(CommonModel, UuidModel, GoogleDriveMixin):
         """
         aggregated_cost = self.aggregate_line_items().aggregate(total_cost=models.Sum('total'))
         return aggregated_cost['total_cost']
+
+    @property
+    def is_approved(self):
+        """
+        Return whether this invoice has been approved or not.
+        """
+        return self.approved in InvoiceApproval.approved_choices()
+
+    @property
+    def html_template(self):
+        """
+        Get the HTML template associated with this invoice.
+        """
+        if self.template:
+            return self.template.html_template
+        return InvoiceHtmlTemplate.Default
 
     def aggregate_line_items(self, fields=None):
         """
@@ -274,7 +305,7 @@ class Invoice(CommonModel, UuidModel, GoogleDriveMixin):
 
         TODO: This should be a synchronous job on a non-web worker.
         """
-        template = get_template('{template}/{template}.html'.format(template=self.template))
+        template = get_template('{template}/{template}.html'.format(template=self.html_template))
         invoice = template.render({
             'site': Site.objects.get_current(),
             'invoice': self,
@@ -288,25 +319,7 @@ class Invoice(CommonModel, UuidModel, GoogleDriveMixin):
         self.pdf_path = os.path.join(settings.INVOICE_PDF_PATH, '{}.pdf'.format(uuid.uuid4()))
         pdf_configuration = pdfkit.configuration(wkhtmltopdf=settings.HTML_TO_PDF_BINARY_PATH)
         pdfkit.from_string(invoice, self.pdf_path, configuration=pdf_configuration, options=self.PDF_OPTIONS)
-
-    def save(self, *args, **kwargs):
-        """
-        Convert the invoice to a PDF and/or upload it to Google Drive after a successful save.
-        """
-        super().save(**kwargs)
-        if self.auto_download_jira_worklogs_on_save:
-            self.fill_line_items_from_jira()
-        if self.auto_create_pdf_on_save:
-            self.to_pdf()
-        if self.auto_upload_google_drive_on_save:
-            file = self.upload_to_google_drive(
-                file_path=self.pdf_path,
-                target_path=[self.date.strftime('%Y'), 'invoices-in', self.date.strftime('%m')],
-                title=self.pdf_filename,
-            )
-            # We can't save this field because we're already in the save method, so set it and then update it directly.
-            self.pdf_path = file['webContentLink']
-            Invoice.objects.filter(pk=self.pk).update(pdf_path=self.pdf_path)
+        return self.pdf_path
 
 
 class LineItem(CommonModel):
@@ -346,7 +359,7 @@ class LineItem(CommonModel):
     class Meta:
         verbose_name = _('Line Item')
         verbose_name_plural = _('Line Items')
-        unique_together = ('line_item_id', 'key')
+        unique_together = ('invoice', 'line_item_id', 'key')
 
     def __str__(self):
         """

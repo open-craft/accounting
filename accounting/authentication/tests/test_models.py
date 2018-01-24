@@ -20,3 +20,27 @@
 """
 Tests for Authentication models.
 """
+
+import ddt
+
+from accounting.authentication.tests import factories
+from accounting.common.tests.base import TestCase
+
+
+@ddt.ddt
+class UserTestCase(TestCase):
+    """ Test cases for `models.User`. """
+
+    def setUp(self):
+        """ Set up test objects. """
+        self.user = factories.UserFactory(full_name='Full Name', username='username')
+        super().setUp()
+
+    @ddt.data(str, repr)
+    def test_string_conversion(self, conversion_method):
+        """ String conversion works for both `str` and `repr`. """
+        self.assertEqual(conversion_method(self.user), 'username')
+
+    def test_get_full_name(self):
+        """ The `get_full_name` method gets the custom `full_name` field. """
+        self.assertEqual(self.user.get_full_name(), 'Full Name')

@@ -27,6 +27,10 @@ from pydrive.drive import GoogleDrive as UpstreamGoogleDrive
 class GoogleDrive(UpstreamGoogleDrive):
     """
     An override of the upstream Google Drive to provide additional functionality.
+
+    Note: You might run into a bunch of `ModuleNotFoundError` and `ImportError` errors when running with PyDrive,
+    but don't fret -- the upstream Google API Client just tries to import a bunch of stuff and sees what's available.
+    It won't crash the worker.
     """
 
     # A query for finding a folder.

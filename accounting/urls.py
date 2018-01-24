@@ -25,13 +25,15 @@ from django.conf import settings
 from django.conf.urls import include, static, url
 from django.contrib import admin
 
+from accounting.invoice.urls import router as invoice_router
+
 urlpatterns = [
+    url(r'^', include(invoice_router.urls, namespace='invoice')),
     url(r'^admin/', admin.site.urls),
     url(r'^account/', include('accounting.account.urls', namespace='account')),
     url(r'^address/', include('accounting.address.urls', namespace='address')),
     url(r'^auth/', include('accounting.authentication.urls', namespace='auth')),
     url(r'^bank/', include('accounting.bank.urls', namespace='bank')),
-    url(r'^invoice/', include('accounting.invoice.urls', namespace='invoice')),
     url(r'^registration/', include('accounting.registration.urls', namespace='registration')),
     url(r'^third_party/', include('accounting.third_party_api.urls', namespace='third_party')),
     url(r'^transferwise/', include('accounting.transferwise.urls', namespace='transferwise')),

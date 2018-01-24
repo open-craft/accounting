@@ -28,10 +28,17 @@ from accounting.common.admin import UuidModelAdmin
 from accounting.invoice import models
 
 
+@admin.register(models.InvoiceTemplate)
+class InvoiceTemplateAdmin(UuidModelAdmin):
+    """ Admin configuration for the `InvoiceTemplate` model. """
+    list_display = UuidModelAdmin.list_display + ('provider', 'numbering_scheme',)
+    search_fields = ('provider__user__username',)
+
+
 @admin.register(models.Invoice)
 class InvoiceAdmin(UuidModelAdmin, SimpleHistoryAdmin):
     """ Admin configuration for the `Invoice` model. """
-    list_display = ('number', 'provider', 'client', 'due_date', 'paid',)
+    list_display = UuidModelAdmin.list_display + ('number', 'provider', 'client', 'due_date', 'approved', 'paid',)
     search_fields = ('provider__user__username', 'client__user__username',)
     readonly_fields = ('pdf_path',)
 

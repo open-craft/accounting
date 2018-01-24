@@ -18,25 +18,31 @@
 #
 
 """
-Management command for generating data (usually for a development environment) to play with.
+Invoice utilities.
 """
 
-import logging
+from datetime import timedelta
+import datetime
 
-from django.core.management import BaseCommand
-
-LOGGER = logging.getLogger(__name__)
+from django.utils import timezone
 
 
-class Command(BaseCommand):
+def get_last_day_past_month():
     """
-    A management command to generate data for the Invoice application.
+    Return the `datetime` object representing the last day of the month that just passed.
     """
+    return timezone.now().replace(day=1) - datetime.timedelta(days=1)
 
-    help = 'Generate data for the Invoice app, usually to play with in a development environment.'
 
-    def handle(self, *args, **options):
-        """
-        TODO: Implement.
-        """
-        pass
+def get_first_day_past_month():
+    """
+    Return the `datetime` object representing the first day of the month that just passed.
+    """
+    return get_last_day_past_month().replace(day=1)
+
+
+def get_day_with_offset(offset=20):
+    """
+    Return the `datetime` object representing the day which comes `offset` days after today.
+    """
+    return timezone.now() + timedelta(days=offset)

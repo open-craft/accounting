@@ -31,14 +31,24 @@ from accounting.common.tests.factories import UuidFactory
 from accounting.invoice import models
 
 
+class InvoiceTemplateFactory(UuidFactory):
+    """ Factory for `models.InvoiceTemplate`. """
+
+    provider = factory.SubFactory(AccountFactory)
+    extra_text = factory.Faker('text')
+    extra_image = factory.django.ImageField()
+
+    class Meta:
+        model = models.InvoiceTemplate
+
+
 class InvoiceFactory(UuidFactory):
     """ Factory for `models.Invoice`. """
 
     provider = factory.SubFactory(AccountFactory)
     client = factory.SubFactory(AccountFactory)
-    extra_text = factory.Faker('text')
-    extra_image = factory.django.ImageField()
     pdf_path = factory.Faker('uri')
+    template = factory.SubFactory(InvoiceTemplateFactory)
 
     class Meta:
         model = models.Invoice

@@ -21,6 +21,9 @@
 Invoice URL Configuration.
 """
 
-urlpatterns = [
+from rest_framework import routers
 
-]
+from accounting.invoice import views
+
+router = routers.SimpleRouter()
+router.register('invoice', views.InvoiceViewSet, base_name='invoice')

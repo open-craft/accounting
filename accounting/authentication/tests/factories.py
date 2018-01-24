@@ -17,7 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-# pylint: disable=attribute-defined-outside-init
 """
 Factories for testing the Account application.
 """
@@ -36,6 +35,7 @@ class UserFactory(UuidFactory):
     email = factory.Faker('email')
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
+    full_name = ''
 
     class Meta:
         model = models.User
@@ -45,5 +45,6 @@ class UserFactory(UuidFactory):
         """
         Let the user's `full_name` be a combination of `first_name` and `last_name`.
         """
-        self.full_name = '{} {}'.format(self.first_name, self.last_name)
+        if not self.full_name:
+            self.full_name = '{} {}'.format(self.first_name, self.last_name)
         self.save()
