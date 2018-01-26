@@ -139,7 +139,7 @@ class TransferWiseBulkPaymentTestCase(TestCase):
     def test_auto_upload_google_drive_on_save(self, mock_upload_to_google_drive):
         """ `upload_to_google_drive` is called when `auto_upload_google_drive_on_save` is checked. """
         csv_path = 'https://drive.google.com/bulk_payment.csv'
-        mock_upload_to_google_drive.return_value = {'webContentLink': csv_path}
+        mock_upload_to_google_drive.return_value = {'alternateLink': csv_path}
         self.bulk_payment.auto_upload_google_drive_on_save = True  # pylint: disable=invalid-name,useless-suppression
         self.bulk_payment.save()
         mock_upload_to_google_drive.assert_called_once()

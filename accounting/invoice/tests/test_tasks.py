@@ -99,7 +99,7 @@ class InvoiceApprovalRequestTestCase(TestCase):
         """ The invoice approval request email sent out every month contains proper information. """
         # Mock.
         pdf_path = 'https://drive.google.com/invoice.pdf'
-        mock_upload_to_google_drive.return_value = {'webContentLink': pdf_path}
+        mock_upload_to_google_drive.return_value = {'alternateLink': pdf_path}
         mock_to_pdf.return_value = pdf_path
 
         # Call.
@@ -158,7 +158,7 @@ class InvoiceFinalizationTestCase(TestCase):
         """ The invoice finalization email sent out every month contains proper information. """
         # Mock.
         pdf_path = 'https://drive.google.com/invoice.pdf'
-        mock_upload_to_google_drive.return_value = {'webContentLink': pdf_path}
+        mock_upload_to_google_drive.return_value = {'alternateLink': pdf_path}
         mock_to_pdf.return_value = pdf_path
 
         # Call.

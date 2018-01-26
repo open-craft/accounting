@@ -136,7 +136,7 @@ class TransferWiseBulkPayment(CommonModel, UuidModel, TransferWiseCsvMixin, Goog
                 title=self.csv_filename,
             )
             # We can't save this field because we're already in the save method, so set it and then update it directly.
-            self.csv_path = file['webContentLink']
+            self.csv_path = file['alternateLink']
             TransferWiseBulkPayment.objects.filter(pk=self.pk).update(csv_path=self.csv_path)
 
 

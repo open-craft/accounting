@@ -75,7 +75,7 @@ def upload_invoice_to_google_drive(invoice, draft_invoice=False):
         target_path=target_path,
         title=invoice.pdf_filename,
     )
-    invoice.pdf_path = file['webContentLink']
+    invoice.pdf_path = file['alternateLink']
     invoice.save()
 
 
