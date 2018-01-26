@@ -72,6 +72,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'djmoney',
     'huey.contrib.djhuey',
+    'rangefilter',
     'rest_framework',
     'rest_framework.authtoken',
     'simple_email_confirmation',

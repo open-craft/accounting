@@ -22,20 +22,35 @@ Admin for the TransferWise app.
 """
 
 from django.contrib import admin
+from django.utils.html import format_html
+from rangefilter.filter import DateRangeFilter
 
 from accounting.common.admin import UuidModelAdmin
 from accounting.transferwise import models
 
 
+# pylint: disable=no-self-use
 @admin.register(models.TransferWiseBulkPayment)
 class TransferWiseBulkPaymentAdmin(UuidModelAdmin):
     """ Admin configuration for the `TransferWiseBulkPayment` model. """
-    list_display = ('date', 'csv_path',)
-    readonly_fields = ('csv_path',)
+
+    list_display = ('__str__', 'csv_link',)
+    list_filter = (('date', DateRangeFilter),)
+    readonly_fields = ('csv_link',)
+    exclude = ('csv_path',)
+
+    def csv_link(self, instance):
+        """The bulk payment's clickable CSV path."""
+        return format_html(
+            '<a href="{url}">Click here to see CSV.</a>',
+            url=instance.csv_path
+        ) if instance.csv_path else 'No CSV available.'
 
 
 @admin.register(models.TransferWisePayment)
 class TransferWisePaymentAdmin(UuidModelAdmin):
     """ Admin configuration for the `TransferWisePayment` model. """
-    list_display = ('date', 'invoice',)
+
+    list_display = ('__str__', 'invoice',)
+    list_filter = (('date', DateRangeFilter),)
     search_fields = ('invoice__uuid', 'invoice__client__user__username', 'invoice__provider__user__username',)

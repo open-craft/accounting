@@ -23,6 +23,7 @@ Base classes for test classes throughout the Accounting service.
 
 from django.contrib.sites.models import Site
 from django.test import TestCase as DjangoTestCase
+from rest_framework.test import APITestCase
 
 from accounting.account.tests.factories import AccountFactory, HourlyRateFactory
 from accounting.invoice.models import InvoiceTemplate
@@ -53,5 +54,29 @@ class TestCase(DjangoTestCase):
         )
         self.provider1 = AccountFactory()
         self.provider2 = AccountFactory()
-        HourlyRateFactory(client=self.client, provider=self.provider1)
-        HourlyRateFactory(client=self.client, provider=self.provider2)
+        self.hourly_rate1 = HourlyRateFactory(client=self.client, provider=self.provider1, hourly_rate__currency='EUR')
+        self.hourly_rate2 = HourlyRateFactory(client=self.client, provider=self.provider2, hourly_rate__currency='EUR')
+
+
+class ApiTestCase(APITestCase, TestCase):
+    """ Common API test case for API test classes throughout the Accounting service. """
+
+    def create_client_and_provider_links(self):
+        """
+        Create a client and some providers, and link them with hourly rates.
+
+        Differs from the super `create_client_and_provider_links` by using a different name for the client variable,
+        since `APITestCase` already uses `self.client`.
+        """
+        # pylint: disable=attribute-defined-outside-init
+        self.client_account = AccountFactory(
+            business_name='OpenCraft GmbH',
+            user__username='opencraft',
+            user__email='billing@opencraft.com'
+        )
+        self.provider1 = AccountFactory()
+        self.provider2 = AccountFactory()
+        self.hourly_rate1 = HourlyRateFactory(
+            client=self.client_account, provider=self.provider1, hourly_rate__currency='EUR')
+        self.hourly_rate2 = HourlyRateFactory(
+            client=self.client_account, provider=self.provider2, hourly_rate__currency='EUR')

@@ -153,7 +153,7 @@ class Invoice(CommonModel, UuidModel, GoogleDriveMixin):
         Indicate between who this invoice is, and whether it has been paid.
         """
         return '{date}: {provider} invoicing {client} ({paid})'.format(
-            date=self.date,
+            date=self.date_formatted,
             provider=self.provider,
             client=self.client,
             paid='PAID' if self.paid else 'PENDING',
@@ -172,7 +172,7 @@ class Invoice(CommonModel, UuidModel, GoogleDriveMixin):
         Return a PDF filename for this invoice.
         """
         return 'invoice_{provider}_{client}_{date}.pdf'.format(
-            date=self.date.strftime("%Y-%m-%d"),
+            date=self.date_formatted,
             provider=self.provider.user.username,
             client=self.client.user.username,
         )
@@ -183,7 +183,7 @@ class Invoice(CommonModel, UuidModel, GoogleDriveMixin):
         Get the total quantity of all line items on the invoice.
         """
         aggregated_quantity = self.aggregate_line_items().aggregate(total_quantity=models.Sum('quantity'))
-        return aggregated_quantity['total_quantity']
+        return aggregated_quantity['total_quantity'] or 0
 
     @property
     def total_cost(self):
@@ -191,7 +191,7 @@ class Invoice(CommonModel, UuidModel, GoogleDriveMixin):
         Get the total cost of all line items on the invoice.
         """
         aggregated_cost = self.aggregate_line_items().aggregate(total_cost=models.Sum('total'))
-        return aggregated_cost['total_cost']
+        return aggregated_cost['total_cost'] or 0
 
     @property
     def is_approved(self):

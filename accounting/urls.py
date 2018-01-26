@@ -44,8 +44,6 @@ if settings.DEBUG:
     urlpatterns += static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     if settings.ENABLE_DEBUG_TOOLBAR:
         import debug_toolbar
-        # "debug" URL pattern must be before "site" URL pattern.
-        # See https://github.com/jazzband/django-debug-toolbar/issues/529
         urlpatterns += [
             url(r'^__debug__/', include(debug_toolbar.urls, namespace='debug')),
         ]

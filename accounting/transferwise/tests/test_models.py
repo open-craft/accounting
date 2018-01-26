@@ -77,7 +77,7 @@ class TransferWiseBulkPaymentTestCase(TestCase):
     @ddt.data(str, repr)
     def test_string_conversion(self, conversion_method):
         """ String conversion works for both `str` and `repr`. """
-        self.assertEqual(conversion_method(self.bulk_payment), '2018-01-10 20:31:03.350993+00:00: OpenCraft GmbH')
+        self.assertEqual(conversion_method(self.bulk_payment), '2018-01-10: OpenCraft GmbH')
 
     @ddt.data(NOW, NOW - timezone.timedelta(days=31))
     def test_create_payments(self, date):
@@ -139,5 +139,5 @@ class TransferWisePaymentTestCase(TestCase):
         """ String conversion works for both `str` and `repr`. """
         self.assertEqual(
             conversion_method(self.payment),
-            '2018-01-10 20:31:03.350993+00:00: OpenCraft GmbH paid Developer'
+            '2018-01-10: OpenCraft GmbH paying Developer'
         )

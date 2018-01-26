@@ -50,10 +50,6 @@ class InvoiceNumberingSchemeTestCase(TestCase):
     """ Test cases for `choices.InvoiceNumberingScheme`. """
 
     @freezegun.freeze_time(NOW)
-    def setUp(self):
-        """ Setup test objects. """
-        super().setUp()
-
     def test_default_default(self):
         """ The default value of the `default` choice corresponds to the correct year and month. """
         self.assertEqual(choices.InvoiceNumberingScheme.default_default(), '2018-01')
@@ -62,11 +58,13 @@ class InvoiceNumberingSchemeTestCase(TestCase):
         """ The default value of the `number` choice corresponds to the correct integer. """
         self.assertEqual(choices.InvoiceNumberingScheme.default_number(), '1')
 
+    @freezegun.freeze_time(NOW)
     def test_default_year_month_number(self):
         """ The default value of the `year_month_number` choice corresponds to the correct year, month,
         and number combo. """
         self.assertEqual(choices.InvoiceNumberingScheme.default_year_month_number(), '2018-01-1')
 
+    @freezegun.freeze_time(NOW)
     def test_default_opencraft_year_month(self):
         """ The default value of the `opencraft_year_month` choice corresponds to the correct prefix and
         year, month combo. """
@@ -76,6 +74,7 @@ class InvoiceNumberingSchemeTestCase(TestCase):
         """ The default value of the `opencraft_number` choice corresponds to the correct prefix and number combo. """
         self.assertEqual(choices.InvoiceNumberingScheme.default_opencraft_number(), 'OC-1')
 
+    @freezegun.freeze_time(NOW)
     @ddt.data(
         (choices.InvoiceNumberingScheme.default, '2018-01'),
         (choices.InvoiceNumberingScheme.number, '1'),
@@ -88,6 +87,7 @@ class InvoiceNumberingSchemeTestCase(TestCase):
         """ Get the default value of an arbitrary numbering scheme. """
         self.assertEqual(choices.InvoiceNumberingScheme.default_value(numbering_scheme), default_value)
 
+    @freezegun.freeze_time(NOW)
     @ddt.data(
         ('2018-01', '2018-02'),
         ('2018-12', '2019-01'),
@@ -106,6 +106,7 @@ class InvoiceNumberingSchemeTestCase(TestCase):
         """ Incrementing the `number` choice gives the correct number, including with leading 0s. """
         self.assertEqual(choices.InvoiceNumberingScheme.increment_number(value), incremented_value)
 
+    @freezegun.freeze_time(NOW)
     @ddt.data(
         ('2018-01-4', '2018-02-5'),
         ('2018-12-10', '2019-01-11'),
@@ -119,6 +120,7 @@ class InvoiceNumberingSchemeTestCase(TestCase):
          including for wrap-arounds and with leading 0s. """
         self.assertEqual(choices.InvoiceNumberingScheme.increment_year_month_number(value), incremented_value)
 
+    @freezegun.freeze_time(NOW)
     @ddt.data(
         ('OC-2018-01', 'OC-2018-02'),
         ('OC-2018-12', 'OC-2019-01'),
@@ -138,6 +140,7 @@ class InvoiceNumberingSchemeTestCase(TestCase):
         """ Incrementing the `opencraft_number` choice gives the correct prefix and number including for leading 0s. """
         self.assertEqual(choices.InvoiceNumberingScheme.increment_opencraft_number(value), incremented_value)
 
+    @freezegun.freeze_time(NOW)
     @ddt.data(
         (choices.InvoiceNumberingScheme.default, '2018-12', '2019-01'),
         (choices.InvoiceNumberingScheme.number, '2', '3'),

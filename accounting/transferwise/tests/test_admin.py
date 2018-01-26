@@ -20,3 +20,32 @@
 """
 Tests for the TransferWise admin.
 """
+
+from django.contrib.admin import sites
+import ddt
+
+from accounting.common.tests.base import ApiTestCase
+from accounting.transferwise import admin, models
+from accounting.transferwise.tests import factories
+
+
+@ddt.ddt
+class TransferWiseBulkPaymentAdminTestCase(ApiTestCase):
+    """ Test cases for `admin.TransferWiseBulkPaymentAdmin`. """
+
+    def setUp(self):
+        """ Set up test objects. """
+        self.site = sites.AdminSite()
+        self.admin = admin.TransferWiseBulkPaymentAdmin(models.TransferWiseBulkPayment, self.site)
+        self.bulk_payment1 = factories.TransferWiseBulkPaymentFactory(csv_path='https://drive.google.com/f/asdf1.csv')
+        self.bulk_payment2 = factories.TransferWiseBulkPaymentFactory(csv_path='')
+        super().setUp()
+
+    @ddt.data(
+        ('bulk_payment1', '<a href="https://drive.google.com/f/asdf1.csv">Click here to see CSV.</a>'),
+        ('bulk_payment2', 'No CSV available.'),
+    )
+    @ddt.unpack
+    def test_csv_link(self, bulk_payment, expected_csv_link):
+        """The CSV link returns the appropriate HTML and URL."""
+        self.assertEqual(self.admin.csv_link(getattr(self, bulk_payment)), expected_csv_link)
