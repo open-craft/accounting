@@ -56,13 +56,19 @@ For example:
 
 This would mean that the integration uploaded `invoice.pdf` to folder `09`, inside folder `invoices-in`, which was inside folder `2017`. This also thus corresponds to the invoice's date being `2017-09-X` where `X` is any day in September.
 
+You need to manually create the parent folders (`2017`, `invoices-in`, `09`) for the file to be placed inside.
+
+Given the file path examples above, set `GOOGLE_DRIVE_ROOT` to the ID of the folder that *contains* the year folder, i.e. the one that contains `2017`. The ID for this folder is in the URL when you're actually looking at the folder in your browser. E.g. if you see `https://drive.google.com/drive/u/1/folders/1NLXlnhTY4RcpGQuvFgRNPiv0fYZ3peI7`, then use just `1NLXlnhTY4RcpGQuvFgRNPiv0fYZ3peI7` as the ID.
+
 For your development environment to use Google Drive integration, you'll have to set up a service account on Google Console. This service account can then be associated with PKCS12 credentials, which you can download.
 
-The PKCS12 credentials can be stored as `.p12` in the root of this repository, or anything that matches the `GOOGLE_AUTH_PKCS12_FILE_PATH` setting.
+The downloaded PKCS12 credentials can be stored as a file named `.p12` in the root of this repository, or you can write the downloaded file's name in the `GOOGLE_AUTH_PKCS12_FILE_PATH` setting.
 
 You need to let the integration know the service account's email through `GOOGLE_AUTH_CLIENT_SERVICE_EMAIL` -- this information should be obvious from the console when you create the user, or through the JSON credentials file which you have the option of downloading, akin to downloading the PKCS12 file.
+`GOOGLE_AUTH_CLIENT_USER_EMAIL` doesn't need to be changed.
 
-Service accounts also need to be given permission to your (presumably private) Google Drive folder. Given the file path examples above, set `GOOGLE_DRIVE_ROOT` to the ID of the folder that *contains* the year folder, i.e. the one that contains `2017`. The ID for this folder is in the URL when you're actually looking at the folder in your browser.
+Service accounts also need to be given permission to your (presumably private) Google Drive folder.
+E.g. if you want invoices to be visible by `someuser@projectname.net`, that user must open the dropdown near the folder name, click `Share with others`, and type the e-mail of the service account (e.g. `bot-name@project-name.iam.gserviceaccount.com`).
 
 Make sure to set `ENABLE_GOOGLE=true`!
 
