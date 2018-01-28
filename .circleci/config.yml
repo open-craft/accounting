@@ -5,6 +5,7 @@ jobs:
       - image: python:3.6
         environment:
           DATABASE_URL: postgresql://postgres:password@localhost:5432/postgres
+          SHELL: /bin/bash
       - image: postgres:10.1
         environment:
           POSTGRES_USERNAME: postgres
@@ -19,25 +20,24 @@ jobs:
 
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "requirements.txt" }}
+          - v1-dependencies-{{ checksum "Pipfile" }}
           - v1-dependencies-
 
       - run:
           name: Install Dependencies
           command: |
-            python3 -m venv ~/venv
-            . ~/venv/bin/activate
-            pip install -r requirements.txt
+            pip install pipenv
+            pipenv install --python 3.6
 
       - save_cache:
           paths:
-            - ~/venv
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
-        
+            - pipenv --venv
+          key: v1-dependencies-{{ checksum "Pipfile" }}
+
       - run:
           name: Run Tests
           command: |
-            . ~/venv/bin/activate
+            . $(pipenv --venv)/bin/activate
             make test
 
       - store_artifacts:

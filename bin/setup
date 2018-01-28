@@ -1,45 +1,43 @@
-#!/bin/bash 
+#!/bin/bash
+
 set -e
 
-# Fixes UTF-8 warning ("Your terminal is not configured to receive UTF-8 encoded text.") on some machines.
-export PYTHONIOENCODING="utf-8"
-grep -Fq 'export PYTHONIOENCODING' ~/.bashrc ||
-echo 'export PYTHONIOENCODING="utf-8"' >> ~/.bashrc
-
-# cd to ~/accounting on login
-if [[ $USER == 'ubuntu' ]]; then
+# Go to ~/accounting on login & activate the virtual environment.
+# The UTF-8 exports fix UTF-8 warnings, i.e. "Your terminal is not configured to receive UTF-8 encoded text.", on some machines.
+if [[ $USER == 'vagrant' ]]; then
     mkdir -p ~/accounting
     cd ~/accounting
-    grep -Fq 'cd ~/accounting' ~/.bashrc || echo 'cd ~/accounting' >> ~/.bashrc
+    grep -Fq 'cd ~/accounting &&
+              export PYTHONIOENCODING=utf-8 &&
+              export LC_ALL=C.UTF-8 &&
+              export LANG=C.UTF-8 &&
+              source $(pipenv --venv)/bin/activate' ~/.bashrc \
+    || echo 'cd ~/accounting &&
+             export PYTHONIOENCODING=utf-8 &&
+             export LC_ALL=C.UTF-8 &&
+             export LANG=C.UTF-8 &&
+             source $(pipenv --venv)/bin/activate' >> ~/.bashrc
 fi
 
-# Need python-3.6 repository
+# Need python-3.6 repository.
 echo "Setting up python3.6 repository"
 sudo add-apt-repository 'ppa:deadsnakes/ppa'
-sudo apt-get -y update
+sudo apt-get update
 
-# Install all dependencies.
+# Install all system and python dependencies, and generate & activate a virtual environment.
 cd ~/accounting
-echo "Installing dependencies."
+echo "Installing system dependencies."
+# Unfortunately we can't use `make install_system_dependencies` because we don't have `make` yet.
 sudo -E apt-get install -y `grep -v '^#' debian_packages.lst | tr -d '\r'`
-
-# Activate VirtualEnv
-cd ~/
-mkdir -p ~/.virtualenvs
-python3.6 -m venv ~/.virtualenvs/accounting
-source ~/.virtualenvs/accounting/bin/activate
-
-# Activate virtualenv on login
-if [[ $USER == 'ubuntu' ]]; then
-    grep -Fq 'source ~/.virtualenvs/accounting/bin/activate' ~/.bashrc ||
-    echo 'source ~/.virtualenvs/accounting/bin/activate' >> ~/.bashrc
-fi
+sudo -H python3.6 -m pip install pipenv pew
+pipenv install --python 3.6
+source $(pipenv --venv)/bin/activate
 
 # Create postgres user
 sudo -u postgres createuser -d $USER ||
   echo "Could not create postgres user '$USER' - it probably already exists"
 
-# Allow access to postgres from localhost without password
+# Allow access to postgres from localhost without password, and restart the DB and perform migrations.
 cat << EOF | sudo tee /etc/postgresql/9.5/main/pg_hba.conf
 local   all             postgres                                trust 
 local   all             all                                     trust
@@ -48,13 +46,4 @@ host    all             all             ::1/128                 trust
 host    all             all             0.0.0.0/0               password 
 EOF
 sudo service postgresql restart
-
-# Need to upgrade pip 
-pip install --upgrade setuptools
-
-# Setup Python Requirements
-cd ~/accounting
-pip install -r requirements.txt
-
-# Initial Migration
 make migrate
