@@ -25,6 +25,7 @@ import csv
 import datetime
 import os
 
+from django.db.models.query import QuerySet
 from django.utils import timezone
 import freezegun
 
@@ -32,7 +33,7 @@ from accounting.account.tests.factories import AccountFactory
 from accounting.bank.tests.factories import BankAccountFactory
 from accounting.common.tests.base import TestCase
 from accounting.invoice.tests.factories import InvoiceFactory, LineItemFactory
-from accounting.transferwise import mixins
+from accounting.transferwise import mixins, models
 from accounting.transferwise.tests import factories
 
 NOW = datetime.datetime(2018, 1, 10, 20, 31, 3, 350993, tzinfo=timezone.utc)
@@ -87,7 +88,8 @@ class TransferWiseCsvMixinTestCase(TestCase):
 
     def test_to_bulk_payment_csv(self):
         """ A bulk payment CSV is generated with all the proper columns and rows. """
-        self.csv_path = self.mixin.to_bulk_payment_csv([self.payment1, self.payment2])
+        self.mixin.payments = QuerySet(model=models.TransferWisePayment)
+        self.csv_path = self.mixin.to_bulk_payment_csv()
         with open(self.csv_path.name, newline='') as csv_file:
             reader = csv.reader(csv_file)
             self.assertEqual(next(reader), [
@@ -125,7 +127,8 @@ class TransferWiseCsvMixinTestCase(TestCase):
 
     def test_to_bulk_payment_csv_no_payments(self):
         """ A bulk payment CSV is generated with only columns and no rows because no payments exist. """
-        self.csv_path = self.mixin.to_bulk_payment_csv([])
+        self.mixin.payments = QuerySet(model=models.TransferWisePayment).none()
+        self.csv_path = self.mixin.to_bulk_payment_csv()
         with open(self.csv_path.name, newline='') as csv_file:
             reader = csv.reader(csv_file)
             self.assertEqual(next(reader), [

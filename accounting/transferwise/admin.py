@@ -30,8 +30,7 @@ from accounting.transferwise import models
 @admin.register(models.TransferWiseBulkPayment)
 class TransferWiseBulkPaymentAdmin(UuidModelAdmin):
     """ Admin configuration for the `TransferWiseBulkPayment` model. """
-    list_display = ('date', 'sender', 'csv_path',)
-    search_fields = ('sender__user__username',)
+    list_display = ('date', 'csv_path',)
     readonly_fields = ('csv_path',)
 
 

@@ -38,7 +38,7 @@ class TransferWiseCsvMixin:
 
     CSV_ROW = namedtuple('CsvRow', list(TransferWiseCsvColumns.attributes.values()))
 
-    def to_bulk_payment_csv(self, payments):
+    def to_bulk_payment_csv(self):
         """
         Turn a list of TransferWise CSV rows into rows in a real CSV.
 
@@ -51,7 +51,7 @@ class TransferWiseCsvMixin:
             writer.writerow(list(TransferWiseCsvColumns.attributes.keys()))
 
             # Now we can write out the recipient rows separately.
-            for payment in payments:
+            for payment in self.payments.all():
                 invoice = payment.invoice
                 recipient = invoice.provider
                 recipient_bank_account = recipient.active_bank_account
