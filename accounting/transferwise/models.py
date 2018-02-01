@@ -108,7 +108,7 @@ class TransferWiseBulkPayment(CommonModel, UuidModel, TransferWiseCsvMixin, Goog
         unpaid_invoices = self.sender.client_invoices.filter(
             paid=False,
             date__range=(self.start_date, self.end_date),
-            provider__bank_accounts__transferwise_recipient_id__isnull=False,
+            provider__bank_account__transferwise_recipient_id__isnull=False,
         )
         for unpaid_invoice in unpaid_invoices:
             self.payments.create(bulk_payment=self, invoice=unpaid_invoice)

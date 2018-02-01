@@ -54,7 +54,7 @@ class TransferWiseCsvMixin:
             for payment in self.payments.all():
                 invoice = payment.invoice
                 recipient = invoice.provider
-                recipient_bank_account = recipient.active_bank_account
+                recipient_bank_account = recipient.bank_account
                 client_currency = invoice.hourly_rate.hourly_rate_currency
                 writer.writerow(self.CSV_ROW(
                     recipient_id=recipient_bank_account.transferwise_recipient_id,

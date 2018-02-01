@@ -39,12 +39,12 @@ class AccountSerializer(UuidModelSerializer):
 
     user = UserSerializer(required=False)
     address = AddressSerializer(required=False)
-    bank_accounts = BankAccountSerializer(required=False, many=True)
+    bank_account = BankAccountSerializer(required=False)
 
     class Meta(UuidModelSerializer.Meta):
         model = models.Account
         fields = (UuidModelSerializer.Meta.fields +
-                  ('user', 'address', 'business_name', 'occupation', 'bank_accounts', 'vat',))
+                  ('user', 'address', 'business_name', 'occupation', 'bank_account', 'vat',))
 
 
 class CreateAccountSerializer(UuidModelSerializer):
