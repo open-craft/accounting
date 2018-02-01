@@ -83,10 +83,9 @@ In order to be able to get containers started, you'll need access to the `docker
 First install it using developmental requirements:
 
 ```bash
-# This assumes your `virtualenv` is on Python 3.x. If not, use the appropriate one.
-$ virtualenv accounting
-$ . accounting/bin/activate
-(accounting) $ pip install -r requirements.txt
+$ sudo python3 -m pip install pipenv
+$ pipenv install --python 3.6
+$ pipenv shell
 ```
 
 If you come up with any funky issues while setting up, make sure you have the latest `python3.6-dev` and `build-essential` packages installed. You might also want to upgrade to the latest packages you install.

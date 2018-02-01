@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-29 09:59+0000\n"
+"POT-Creation-Date: 2018-02-01 12:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -232,11 +232,11 @@ msgstr ""
 msgid "Bank Accounts"
 msgstr ""
 
-#: accounting/common/models.py:54
+#: accounting/common/models.py:64
 msgid "UUID"
 msgstr ""
 
-#: accounting/common/models.py:55
+#: accounting/common/models.py:65
 msgid "The universally unique identifier for this model instance."
 msgstr ""
 
