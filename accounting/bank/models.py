@@ -57,7 +57,7 @@ class BankAccount(CommonModel, UuidModel):
     """
     A bank account stores details to help identify a particular user's bank account anywhere in the world.
 
-    Multiple bank accounts can belong to a single user account.
+    A user can only have one bank account.
 
     Because bank account identifiers differ from country to country (although we're moving towards standardizing
     on IBAN & SWIFT/BIC), we let all bank account identifying details be optional, to let the user pick and choose
@@ -71,10 +71,9 @@ class BankAccount(CommonModel, UuidModel):
     bank = models.ForeignKey(
         Bank, models.CASCADE, related_name='bank_accounts',
         help_text=_("The bank to which this bank account belongs."))
-    user_account = models.ForeignKey(
-        Account, models.CASCADE, related_name='bank_accounts',
-        help_text=_("The user account that this bank account is linked to. "
-                    "A user can have multiple bank accounts associated with their user account."))
+    user_account = models.OneToOneField(
+        Account, models.CASCADE, related_name='bank_account',
+        help_text=_("The user account that this bank account is linked to. "))
     type = models.CharField(
         max_length=30, choices=BankAccountType.choices,
         help_text=_("Whether this is a checking or savings account."))

@@ -54,31 +54,31 @@ msgstr ""
 msgid "Accounts"
 msgstr ""
 
-#: accounting/account/models.py:113
+#: accounting/account/models.py:105
 msgid "The hourly rate charged between a provider and client."
 msgstr ""
 
-#: accounting/account/models.py:116
+#: accounting/account/models.py:108
 msgid ""
 "The account linked to the user who gets paid the hourly rate by the client."
 msgstr ""
 
-#: accounting/account/models.py:119
+#: accounting/account/models.py:111
 msgid ""
 "The account linked to the user who pays the hourly rate to the provider."
 msgstr ""
 
-#: accounting/account/models.py:122
+#: accounting/account/models.py:114
 msgid ""
 "Whether this hourly rate relationship still exists between the provider and "
 "client or not."
 msgstr ""
 
-#: accounting/account/models.py:125
+#: accounting/account/models.py:117
 msgid "Hourly Rate"
 msgstr ""
 
-#: accounting/account/models.py:126
+#: accounting/account/models.py:118
 msgid "Hourly Rates"
 msgstr ""
 
@@ -202,30 +202,28 @@ msgid "The bank to which this bank account belongs."
 msgstr ""
 
 #: accounting/bank/models.py:76
-msgid ""
-"The user account that this bank account is linked to. A user can have "
-"multiple bank accounts associated with their user account."
+msgid "The user account that this bank account is linked to. "
 msgstr ""
 
-#: accounting/bank/models.py:80
+#: accounting/bank/models.py:79
 msgid "Whether this is a checking or savings account."
 msgstr ""
 
-#: accounting/bank/models.py:83
+#: accounting/bank/models.py:82
 msgid ""
 "The TransferWise recipient ID used to identify recipient accounts which "
 "contain bank account information."
 msgstr ""
 
-#: accounting/bank/models.py:87
+#: accounting/bank/models.py:86
 msgid "Unique identification information for this bank account."
 msgstr ""
 
-#: accounting/bank/models.py:90
+#: accounting/bank/models.py:89
 msgid "Bank Account"
 msgstr ""
 
-#: accounting/bank/models.py:91
+#: accounting/bank/models.py:90
 msgid "Bank Accounts"
 msgstr ""
 
