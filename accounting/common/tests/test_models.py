@@ -20,3 +20,27 @@
 """
 Tests for the Common application's models.
 """
+
+import datetime
+
+from django.utils import timezone
+import freezegun
+
+from accounting.authentication.tests.factories import UserFactory
+from accounting.common.tests.base import TestCase
+
+NOW = datetime.datetime(2018, 1, 10, 20, 31, 3, 350993, tzinfo=timezone.utc)
+
+
+class CommonTestCase(TestCase):
+    """Tests for `models.Common`."""
+
+    def setUp(self):
+        """Set up test objects."""
+        super().setUp()
+        self.user = UserFactory()
+
+    @freezegun.freeze_time(NOW)
+    def test_date_formatted_without_date(self):
+        """`date_formatted` returns the date today when the object doesn't have a `date` field."""
+        self.assertEqual(self.user.date_formatted, '2018-01-10')

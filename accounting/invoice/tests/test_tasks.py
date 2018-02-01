@@ -48,6 +48,7 @@ class InvoicePreparationNotificationTestCase(TestCase):
         self.create_client_and_provider_links()
         super().setUp()
 
+    @freezegun.freeze_time(NOW)
     def test_send_invoice_prep_notification(self):
         """ The invoice preparation notification email sent out every month contains proper information. """
         tasks.send_invoice_prep_notification()
@@ -90,6 +91,7 @@ class InvoiceApprovalRequestTestCase(TestCase):
             date=PAST, provider=self.provider2, client=self.client, template=self.template2)
         super().setUp()
 
+    @freezegun.freeze_time(NOW)
     @mock.patch.object(models.Invoice, 'upload_to_google_drive')
     @mock.patch.object(models.Invoice, 'fill_line_items_from_jira')
     @mock.patch.object(EmailMessage, 'attach_file')
@@ -149,6 +151,7 @@ class InvoiceFinalizationTestCase(TestCase):
         self.invoice2 = factories.InvoiceFactory(date=NOW, provider=self.provider2, client=self.client)
         super().setUp()
 
+    @freezegun.freeze_time(NOW)
     @mock.patch.object(models.Invoice, 'upload_to_google_drive')
     @mock.patch.object(models.Invoice, 'fill_line_items_from_jira')
     @mock.patch.object(EmailMessage, 'attach_file')

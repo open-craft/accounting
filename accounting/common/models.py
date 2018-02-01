@@ -22,6 +22,7 @@ Common models used throughout the Accounting service.
 """
 
 from uuid import uuid4
+import datetime
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -35,6 +36,8 @@ class CommonModel(ValidateModelMixin, TimeStampedModel):
     A reusable common model.
     """
 
+    DATE_FORMAT = '%Y-%m-%d'
+
     class Meta:
         abstract = True
 
@@ -43,6 +46,13 @@ class CommonModel(ValidateModelMixin, TimeStampedModel):
         Representation for this model.
         """
         return self.__str__()
+
+    @property
+    def date_formatted(self):
+        """Return a formatted version of the date, as yyyy-mm-dd."""
+        if hasattr(self, 'date') and isinstance(self.date, datetime.datetime):
+            return self.date.strftime(self.DATE_FORMAT)
+        return datetime.datetime.now().strftime(self.DATE_FORMAT)
 
 
 class UuidModel(models.Model):

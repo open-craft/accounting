@@ -69,7 +69,7 @@ class TransferWiseBulkPayment(CommonModel, UuidModel, TransferWiseCsvMixin, Goog
         """
         Indicate who's sending this TransferWise bulk payment, and when.
         """
-        return '{date}: {sender}'.format(date=self.date, sender=self.sender)
+        return '{date}: {sender}'.format(date=self.date_formatted, sender=self.sender)
 
     @property
     def csv_filename(self):
@@ -78,7 +78,7 @@ class TransferWiseBulkPayment(CommonModel, UuidModel, TransferWiseCsvMixin, Goog
         """
         return 'transferwise_bulk_payment_csv_{sender}_{date}.csv'.format(
             sender=self.sender.user.username,
-            date=self.date.strftime("%Y-%m-%d"),
+            date=self.date_formatted,
         )
 
     @property
@@ -140,8 +140,8 @@ class TransferWisePayment(CommonModel, UuidModel):
         """
         Indicate between whom this payment was made, and when.
         """
-        return '{date}: {client} paid {provider}'.format(
-            date=self.date,
+        return '{date}: {client} paying {provider}'.format(
+            date=self.date_formatted,
             client=self.invoice.client,
             provider=self.invoice.provider,
         )

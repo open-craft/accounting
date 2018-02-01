@@ -19,6 +19,7 @@ cryptography==2.1.4       # via pyopenssl
 ddt==1.1.1
 decorator==4.1.2          # via ipython, traitlets
 defusedxml==0.5.0         # via jira
+django-admin-rangefilter==0.3.1
 django-choices==1.6.0
 django-countries==5.0
 django-debug-toolbar==1.9.1

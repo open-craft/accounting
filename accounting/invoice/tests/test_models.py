@@ -67,7 +67,7 @@ class InvoiceTestCase(TestCase):
         """ String conversion works for both `str` and `repr`. """
         self.assertEqual(
             conversion_method(self.invoice),
-            '2018-01-10 20:31:03.350993+00:00: Developer invoicing OpenCraft GmbH (PENDING)'
+            '2018-01-10: Developer invoicing OpenCraft GmbH (PENDING)'
         )
 
 
