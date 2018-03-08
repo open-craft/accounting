@@ -53,5 +53,5 @@ def send_bulk_payment_csv():
         target_path=[bulk_payment.date.strftime('%Y'), 'invoices-in', bulk_payment.date.strftime('%m')],
         title=bulk_payment.csv_filename,
     )
-    bulk_payment.csv_path = file['webContentLink']
+    bulk_payment.csv_path = file['alternateLink']
     bulk_payment.save()
