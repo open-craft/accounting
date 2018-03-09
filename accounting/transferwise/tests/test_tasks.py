@@ -65,7 +65,7 @@ class SendBulkPaymentCsvTestCase(TestCase):
         and uploaded to Google Drive. """
         # Mock.
         csv_path = 'https://drive.google.com/bulk_payment.csv'
-        mock_upload_to_google_drive.return_value = {'webContentLink': csv_path}
+        mock_upload_to_google_drive.return_value = {'alternateLink': csv_path}
         mock_to_bulk_payment_csv.return_value = mock.MagicMock(name=csv_path)
 
         # Call.
