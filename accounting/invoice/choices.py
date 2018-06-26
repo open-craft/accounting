@@ -74,6 +74,7 @@ class InvoiceNumberingScheme(DjangoChoices):
     year_month_number = ChoiceItem('%Y-%m-{number}', _('yyyy-mm-{number} (2018-01-42, for the 42nd invoice)'))
     opencraft_year_month = ChoiceItem('OC-%Y-%m', _('OC-yyyy-mm (OC-2018-01)'))
     opencraft_number = ChoiceItem('OC-{number}', _('OC-{number} (OC-42, for the 42nd invoice)'))
+    year_month_one = ChoiceItem('%Y-%m-01', _('yyyy-mm-01 (2018-01-01, as just one is expected)'))
 
     @classmethod
     def default_default(cls):
@@ -97,6 +98,13 @@ class InvoiceNumberingScheme(DjangoChoices):
         Return the default value given to the `default` choice.
         """
         return '{}-{}'.format(cls.default_default(), cls.default_number())
+
+    @classmethod
+    def default_year_month_one(cls):
+        """
+        Return the default value given to the `default` choice.
+        """
+        return '{}-01'.format(cls.default_default())
 
     @classmethod
     def default_opencraft_year_month(cls):
@@ -158,6 +166,17 @@ class InvoiceNumberingScheme(DjangoChoices):
         incremented_date = cls.increment_default(date)
         incremented_number = cls.increment_number(number)
         return '-'.join([incremented_date, incremented_number])
+
+    @classmethod
+    def increment_year_month_one(cls, value):
+        """
+        Increment the number for the 'year_month_one' numbering scheme.
+
+        Assumes `value` is in the format of the 'year_month_one' numbering scheme.
+        """
+        date, _ = value.rsplit('-', 1)
+        incremented_date = cls.increment_default(date)
+        return '{}-01'.format(incremented_date)
 
     @classmethod
     def increment_opencraft_year_month(cls, value):
