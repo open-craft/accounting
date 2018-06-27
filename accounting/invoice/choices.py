@@ -72,9 +72,9 @@ class InvoiceNumberingScheme(DjangoChoices):
     default = ChoiceItem('%Y-%m', _('yyyy-mm (2018-01)'))
     number = ChoiceItem('{number}', _('{number} (42, for the 42nd invoice)'))
     year_month_number = ChoiceItem('%Y-%m-{number}', _('yyyy-mm-{number} (2018-01-42, for the 42nd invoice)'))
+    year_month_one = ChoiceItem('%Y-%m-01', _('yyyy-mm-01 (2018-01-01, 2018-02-01 etc.)'))
     opencraft_year_month = ChoiceItem('OC-%Y-%m', _('OC-yyyy-mm (OC-2018-01)'))
     opencraft_number = ChoiceItem('OC-{number}', _('OC-{number} (OC-42, for the 42nd invoice)'))
-    year_month_one = ChoiceItem('%Y-%m-01', _('yyyy-mm-01 (2018-01-01, as just one is expected)'))
 
     @classmethod
     def default_default(cls):
@@ -88,35 +88,35 @@ class InvoiceNumberingScheme(DjangoChoices):
     @classmethod
     def default_number(cls):
         """
-        Return the default value given to the `default` choice.
+        Return the default value given to the `number` choice.
         """
         return cls.number.format(number=1)
 
     @classmethod
     def default_year_month_number(cls):
         """
-        Return the default value given to the `default` choice.
+        Return the default value given to the `year_month_number` choice.
         """
         return '{}-{}'.format(cls.default_default(), cls.default_number())
 
     @classmethod
     def default_year_month_one(cls):
         """
-        Return the default value given to the `default` choice.
+        Return the default value given to the `year_month_one` choice.
         """
         return '{}-01'.format(cls.default_default())
 
     @classmethod
     def default_opencraft_year_month(cls):
         """
-        Return the default value given to the `default` choice.
+        Return the default value given to the `year_month` choice.
         """
         return 'OC-{}'.format(cls.default_default())
 
     @classmethod
     def default_opencraft_number(cls):
         """
-        Return the default value given to the `default` choice.
+        Return the default value given to the `opencraft_number` choice.
         """
         return 'OC-{}'.format(cls.default_number())
 
