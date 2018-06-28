@@ -109,7 +109,7 @@ class InvoiceNumberingScheme(DjangoChoices):
     @classmethod
     def default_opencraft_year_month(cls):
         """
-        Return the default value given to the `year_month` choice.
+        Return the default value given to the `opencraft_year_month` choice.
         """
         return 'OC-{}'.format(cls.default_default())
 
