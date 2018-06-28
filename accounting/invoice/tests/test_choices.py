@@ -65,6 +65,12 @@ class InvoiceNumberingSchemeTestCase(TestCase):
         self.assertEqual(choices.InvoiceNumberingScheme.default_year_month_number(), '2018-01-1')
 
     @freezegun.freeze_time(NOW)
+    def test_default_year_month_one(self):
+        """ The default value of the `year_month_one` choice corresponds to the correct year, month,
+        and one combo. """
+        self.assertEqual(choices.InvoiceNumberingScheme.default_year_month_one(), '2018-01-01')
+
+    @freezegun.freeze_time(NOW)
     def test_default_opencraft_year_month(self):
         """ The default value of the `opencraft_year_month` choice corresponds to the correct prefix and
         year, month combo. """
@@ -81,6 +87,7 @@ class InvoiceNumberingSchemeTestCase(TestCase):
         (choices.InvoiceNumberingScheme.year_month_number, '2018-01-1'),
         (choices.InvoiceNumberingScheme.opencraft_year_month, 'OC-2018-01'),
         (choices.InvoiceNumberingScheme.opencraft_number, 'OC-1'),
+        (choices.InvoiceNumberingScheme.year_month_one, '2018-01-01'),
     )
     @ddt.unpack
     def test_default_value(self, numbering_scheme, default_value):
@@ -122,6 +129,20 @@ class InvoiceNumberingSchemeTestCase(TestCase):
 
     @freezegun.freeze_time(NOW)
     @ddt.data(
+        ('2018-01-01', '2018-02-01'),
+        ('2018-12-01', '2019-01-01'),
+        ('2018-12-0001', '2019-01-01'),
+        ('2018-05-42', '2018-06-01'),
+        ('2018-12-257', '2019-01-01'),
+    )
+    @ddt.unpack
+    def test_increment_year_month_one(self, value, incremented_value):
+        """ Incrementing the `year_month_one` choice gives the correct year, month, and 01 combo,
+         including for wrap-arounds and with leading 0s. """
+        self.assertEqual(choices.InvoiceNumberingScheme.increment_year_month_one(value), incremented_value)
+
+    @freezegun.freeze_time(NOW)
+    @ddt.data(
         ('OC-2018-01', 'OC-2018-02'),
         ('OC-2018-12', 'OC-2019-01'),
     )
@@ -147,6 +168,7 @@ class InvoiceNumberingSchemeTestCase(TestCase):
         (choices.InvoiceNumberingScheme.year_month_number, '2018-12-3', '2019-01-4'),
         (choices.InvoiceNumberingScheme.opencraft_year_month, 'OC-2018-09', 'OC-2018-10'),
         (choices.InvoiceNumberingScheme.opencraft_number, 'OC-0002', 'OC-3'),
+        (choices.InvoiceNumberingScheme.year_month_one, '2018-12-01', '2019-01-01'),
     )
     @ddt.unpack
     def test_increment_value(self, numbering_scheme, value, incremented_value):
