@@ -134,7 +134,7 @@ virtualenv-clone = "==0.2.6"
 virtualenv = "==15.1.0"
 wcwidth = "==0.1.7"
 websocket-client = "==0.45.0"
-Werkzeug = "==0.13"
+Werkzeug = "==0.15.3"
 wrapt = "==1.10.11"
 
 
