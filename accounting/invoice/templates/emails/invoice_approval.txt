@@ -1,9 +1,0 @@
-Hello,
-
-I have prepared your invoice for {{ month }}! It is attached and ready for you to review.
-
-When you've looked it over, can you approve it by clicking on this link, or by visiting it in your browser?
-
-{{ approval_url }}
-
-If you find any issues with your invoice, please contact {{ contact_email }} before {{ final_date|date:"F jS" }} -- I will consider your invoice approved by then, and will proceed to sending the corresponding payment.
